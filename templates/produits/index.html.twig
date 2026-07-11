@@ -1,0 +1,108 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+
+<div class="panel">
+    <div class="flex justify-between items-center mb-4">
+        <h1>Liste des produits</h1>
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            <a class="btn btn-primary" href="{{ path('app_produits_new') }}">Nouveau produit</a>
+        </div>
+    </div>
+
+    <table id="datatable" class="table display">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Désignation</th>
+                <th>Catégorie</th>
+                <th>Unité de mesure</th>
+                {% if is_granted('ROLE_ADMIN') %}<th>Prix achat</th>{% endif %}
+                <th>Prix vente</th>
+                <th>Stock min</th>
+                <th>Stock max</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for produit in produits %}
+            <tr>
+                <td>{{ produit.code }}</td>
+                <td>{{ produit.designation }}</td>
+                <td>{{ produit.categorie ? produit.categorie.designation : '—' }}</td>
+                <td>{{ produit.uniteMesure }}</td>
+                {% if is_granted('ROLE_ADMIN') %}<td>Fc {{ produit.prixAchat ? produit.prixAchat|number_format(2) : '—' }}</td>{% endif %}
+                <td>Fc {{ produit.prix|number_format(2) }}</td>
+                <td>{{ produit.minimum }}</td>
+                <td>{{ produit.maximum }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ path('app_produits_show', {'id': produit.id}) }}">Fiche</a>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_produits_edit', {'id': produit.id}) }}">Éditer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center">Aucun produit trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+
+<script>
+    let table = new DataTable('#datatable', {
+        order: [[0, 'asc']],
+        dom: '<"flex justify-between"lf>rtip',
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        },
+        buttons: [
+            {
+                extend: 'copy',
+                text: 'Copier',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'excel',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success',
+                filename: 'Liste des produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'csv',
+                text: 'CSV',
+                className: 'btn btn-sm btn-info',
+                filename: 'Liste des produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'pdf',
+                text: 'PDF',
+                className: 'btn btn-sm btn-danger',
+                filename: 'Liste des produits',
+                title: 'Liste des produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            }
+        ]
+    });
+</script>
+
+{% endblock %}

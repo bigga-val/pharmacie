@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit Taux</title>
+
+{% block body %}
+    <h1>Edit Taux</h1>
+
+    {{ include('taux/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_taux_index') }}">back to list</a>
+
+    {{ include('taux/_delete_form.html.twig') }}
+{% endblock %}

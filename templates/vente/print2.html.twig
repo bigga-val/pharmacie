@@ -1,0 +1,130 @@
+{#{% extends 'components/layout/default.html.twig' %}#}
+{#{% block content %}#}
+    <style>
+        @media print{
+            body * {
+                visibility: hidden;
+            }
+            #panel, #panel *{
+                visibility: visible;
+            }
+            #print {
+                position : absolute;
+                left : 0px;
+                top : 0px;
+            }
+        }
+    </style>
+
+<div class="row printable">
+    <div class="col-md-4">
+    </div>
+    <div style="">
+        <div class="panel" id="panel">
+            <div class="flex justify-between mb-3" style="textAlign:center;">
+                <h3 style="font-size: 25px; justify-content: left">Afya</h3>
+                <span style="justify-content: left">Facture No : {{ vente.numeroVente | upper }} </span><br>
+{#                <span style="text-align: center; ">OPS: {{ vente.createdBy | slice(-vente.createdBy|length, 4 ) }} </span>#}
+                <span style="text-align: center; ">OPS: {{ vente.createdBy | split('@')[0] }} </span>
+
+                {# <button class="btn btn-sm btn-primary" onclick="HTMLtoPDF()"> Generer PDF</button> #}
+            </div>
+            <div>
+                <hr>
+                <table class="table" id="HTMLtoPDF" style="justify-content:center; display: flex">
+                    <tbody>
+{#                    {% set counter = 0 %}#}
+                    {% set total = 0 %}
+                    {% for produit in produits %}
+{#                        {% set counter = counter+1 %}#}
+                        {% set total = total + (produit.qty * produit.produit.prix) %}
+                        <tr style="text-align: center;">
+{#                            <td>{{ counter }}</td>#}
+                            <td>{{ produit.produit.designation }}</td>
+                            <td>{{ produit.produit.prix }}</td>
+                            <td>{{ produit.qty }}</td>
+                            <td>{{ produit.qty * produit.produit.prix }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <span>Total : {{ total }}</span>
+                <h4>
+                    {{ vente.createdAt ? vente.createdAt|date('d-m-Y H:i:s') : '' }}
+                </h4>
+                <h4>
+                    {{ "now"|date("d-m-Y H:i:s") }}
+                </h4>
+            </div>
+        </div>
+    </div>
+
+</div><br>
+<div style="justify-content:center; display: flex;" >
+    <button  type="button" onclick="window.print()" style="font-size:20px;">merci d'avoir acheter chez nous !</button>
+</div>
+
+<div>
+    <button class="btn btn-primary " onclick="printFacture()" >Print</button>
+    <button class="btn btn-primary " id="btnPrint" onclick="window.print()">Print2</button>
+{#    <a href="{{ path('app_vente_test', {'id': vente.id}) }}" class="btn btn-primary btn-sm">Test</a>#}
+
+</div>
+<script src="{{ asset("assets/js/jquery.min.js") }}"></script>
+<script src="{{ asset("assets/js/printThis.min.js") }}"></script>
+<script>
+    function executePrint() {
+        // Simuler l'appui des touches Ctrl+P
+        window.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'p') {
+                window.print();
+                event.preventDefault();
+            }
+        });
+
+        // Créer un événement de clic pour déclencher l'appui des touches Ctrl+P
+        var event = new MouseEvent('click');
+        window.dispatchEvent(event);
+
+
+    }
+</script>
+
+<script>
+    function printFacture(){
+        $('.printable').printThis({
+            debug: false,
+            importCSS: false,
+            importStyle: false,
+
+            header: null,
+            footer: null,
+
+            printContainer: true,
+            copyTagClasses: true,
+            removeScripts: true,
+            doctypeString: '',
+            width: 100,
+            height: 600,
+        });
+
+    }
+
+</script>
+
+    <script>
+        $(document).ready(function(e){
+            $("#btnPrint").click(function(e){
+                printDiv("panel")
+            })
+            function printDiv(divId) {
+                var divToPrint = document.getElementById(divId);
+                var newWin = window.open("");
+                newWin.document.write(divToPrint.outerHTML);
+                newWin.print();
+                newWin.close();
+            }
+        })
+    </script>
+{#{% endblock %}#}

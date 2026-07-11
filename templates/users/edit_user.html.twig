@@ -1,0 +1,38 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+    {{ form_start(form) }}
+    {#    {{ form_widget(form) }}#}
+    {#    {{ form_widget(form.nom) }}#}
+
+    <div>
+        <label for="">Nom d'utilisateur</label>
+        {{ form_widget(form.username, {'attr': {'class': 'form-input'}}) }}
+    </div>
+
+    <div>
+        <label for="">Email</label>
+        {{ form_widget(form.email, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+        <label for="">Telephone</label>
+        {{ form_widget(form.telephone, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+        <label for="">Adresse Physique</label>
+        {{ form_widget(form.adressephysique, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+{#        <label for="">Mot de passe</label>#}
+        {{ form_widget(form.password, {'attr': {'class': 'form-input', 'hidden':'true',     }}) }}
+
+    </div>
+
+
+    <br>
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    {{ form_end(form) }}
+{% endblock %}

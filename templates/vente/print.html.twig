@@ -1,0 +1,113 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <script src="{{ asset("assets/js/jquery-3.1.1.min.js") }}"></script>
+
+    <script src="{{ asset("assets/js/jQuery.print.js") }}"></script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #panel, #panel * {
+                visibility: visible;
+            }
+            #panel {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+        }
+
+    </style>
+    <div class="row printable">
+    <div class="col-md-4">
+    </div>
+    <div style="">
+        <div class="panel" id="panel">
+            <div class="flex justify-between mb-3" style="textAlign:center;">
+                <h3 style="font-size: 25px; justify-content: left">Afya</h3>
+                <span style="justify-content: left">Facture No : {{ vente.numeroVente | upper }} </span><br>
+{#                <span style="text-align: center; ">OPS: {{ vente.createdBy | slice(-vente.createdBy|length, 4 ) }} </span>#}
+                <span style="text-align: center; ">OPS: {{ vente.createdBy | split('@')[0] }} </span>
+
+                {# <button class="btn btn-sm btn-primary" onclick="HTMLtoPDF()"> Generer PDF</button> #}
+            </div>
+            <div>
+                <hr>
+                <table class="table" id="HTMLtoPDF" style="justify-content:center; display: flex">
+                    <tbody>
+{#                    {% set counter = 0 %}#}
+                    {% set total = 0 %}
+                    {% for produit in produits %}
+{#                        {% set counter = counter+1 %}#}
+                        {% set total = total + (produit.qty * produit.produit.prix) %}
+                        <tr style="text-align: center;">
+{#                            <td>{{ counter }}</td>#}
+                            <td>{{ produit.produit.designation }} | </td>
+                            <td>{{ produit.produit.prix }} | </td>
+                            <td>{{ produit.qty }} | </td>
+                            <td>{{ produit.qty * produit.produit.prix }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <span>Total : {{ total }}</span>
+                <h4>
+                    {{ vente.createdAt ? vente.createdAt|date('d-m-Y H:i:s') : '' }}
+                </h4>
+                <h4>
+                    {{ "now"|date("d-m-Y H:i:s") }}
+                </h4>
+            </div>
+        </div>
+    </div>
+    <div id="content_holder">
+        <div id="ele1" class="a">
+            <h3>Element 1</h3>
+            <p>
+                Some random text.
+                <input type="text" value="Dummy input text" />
+            </p>
+            <button class="print-link no-print" onclick="jQuery('#ele1').print()">
+                Print this (jQuery('#ele1').print())
+            </button>
+        </div>
+    </div>
+</div><br>
+<div style="justify-content:center; display: flex;" >
+    <button  type="button" onclick="window.print()" style="font-size:20px;">A bientot !</button>
+</div>
+
+<div>
+    <button class="btn btn-primary " onclick="printFacture()" >Print</button>
+    <button class="btn btn-primary "  onclick="window.print()" id="btnPrint">Print2</button>
+{#    <a href="{{ path('app_vente_test', {'id': vente.id}) }}" class="btn btn-primary btn-sm">Test</a>#}
+
+</div>
+    <div id='DivIdToPrint'>
+        <p>This is a sample text for printing purpose.</p>
+    </div>
+    <p>Do not print.</p>
+    <input type='button' class="btn" id='btn' value='Print' onclick='printDiv();'>
+{#<script src="{{ asset("assets/js/jquery.min.js") }}"></script>#}
+    <script>
+        function printDiv()
+        {
+
+            var divToPrint=document.getElementById('DivIdToPrint');
+
+            var newWin=window.open('','Print-Window');
+
+            newWin.document.open();
+
+            newWin.document.write('<html><body onload="window.print()">'+divToPrint.innerHTML+'</body></html>');
+
+            newWin.document.close();
+
+            setTimeout(function(){newWin.close();},10);
+
+        }
+    </script>
+
+{% endblock %}

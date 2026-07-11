@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit PaieEmploye</title>
+
+{% block body %}
+    <h1>Edit PaieEmploye</h1>
+
+    {{ include('paie_employe/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_paie_employe_index') }}">back to list</a>
+
+    {{ include('paie_employe/_delete_form.html.twig') }}
+{% endblock %}

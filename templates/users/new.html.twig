@@ -1,0 +1,39 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+    {{ form_start(form) }}
+    {#    {{ form_widget(form) }}#}
+    {#    {{ form_widget(form.nom) }}#}
+
+    <div>
+        <label for="">Nom d'utilisateur</label>
+        {{ form_widget(form.username, {'attr': {'class': 'form-input'}}) }}
+    </div>
+
+    <div>
+        <label for="">Email</label>
+        {{ form_widget(form.email, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+        <label for="">Telephone</label>
+        {{ form_widget(form.telephone, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+        <label for="">Adresse Physique</label>
+        {{ form_widget(form.adressephysique, {'attr': {'class': 'form-input'}}) }}
+
+    </div>
+    <div>
+        <label for="">Mot de passe</label>
+        {{ form_widget(form.password, {'attr': {'class': 'form-input', 'placeholder':'default: 123456', 'readOnly':'true'}}) }}
+
+    </div>
+    <br>
+    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    {{ form_end(form) }}
+    <br>
+    <a  href="{{ path("app_user_index") }}" class="border-danger text-danger rounded border border-2 m-2 p-2">Voir la liste</a>
+
+{% endblock %}

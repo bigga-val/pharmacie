@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<title>PaieEmploye index</title>
+
+{% block body %}
+    <h1>PaieEmploye index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Total</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for paie_employe in paie_employes %}
+            <tr>
+                <td>{{ paie_employe.id }}</td>
+                <td>{{ paie_employe.total }}</td>
+                <td>
+                    <a href="{{ path('app_paie_employe_show', {'id': paie_employe.id}) }}">show</a>
+                    <a href="{{ path('app_paie_employe_edit', {'id': paie_employe.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_paie_employe_new') }}">Create new</a>
+{% endblock %}

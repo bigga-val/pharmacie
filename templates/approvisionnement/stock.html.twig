@@ -1,0 +1,135 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Stock des produits</h1>
+    <a class="btn btn-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+</div>
+
+{# Filtre par période #}
+<div class="panel mb-4">
+    <form method="get" action="" class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">Début</label>
+            <input type="date" name="date1" class="form-input">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">Fin</label>
+            <input type="date" name="date2" class="form-input">
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <a href="{{ path('app_approvisionnement_stock') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+        </div>
+    </form>
+</div>
+
+{# Tableau #}
+<div class="panel">
+    <table id="datatable" class="table display">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Produit</th>
+                <th>Valeur stock</th>
+                <th>Entrées</th>
+                <th>Sorties</th>
+                <th>Réservé</th>
+                <th>Balance</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set totalIN = 0 %}
+        {% set counter = 0 %}
+        {% for appro in appros %}
+            {% set counter = counter + 1 %}
+            {% set totalIN = totalIN + appro.coutStockDispo %}
+            {% set balance = appro.stockDisponible %}
+            {% set seuil  = appro.minimum * 1.1 %}
+            {% if balance > seuil %}
+                <tr>
+            {% elseif balance > appro.minimum %}
+                <tr class="text-warning" title="Stock proche du minimum pour {{ appro.designation }}. Pensez à réapprovisionner.">
+            {% else %}
+                <tr class="text-danger" title="Stock minimum atteint ou dépassé pour {{ appro.designation }}.">
+            {% endif %}
+                <td>{{ counter }}</td>
+                <td>{{ appro.designation|capitalize }}</td>
+                <td>Fc {{ appro.coutStockDispo|number_format(0, ',', ' ') }}</td>
+                <td>{{ appro.totalEntree }}</td>
+                <td>{{ appro.totalSortie }}</td>
+                <td>{{ appro.totalReserve }}</td>
+                <td class="font-semibold">{{ balance }}</td>
+                <td></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center">Aucun produit trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-4">
+        <span class="btn btn-outline-info">Valeur totale du stock : {{ totalIN|number_format(0, ',', ' ') }} Fc</span>
+    </div>
+</div>
+
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+
+<script>
+    let table = new DataTable('#datatable', {
+        order: [[6, 'asc']],
+        dom: '<"flex justify-between"lf>rtip',
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        },
+        buttons: [
+            {
+                extend: 'copy',
+                text: 'Copier',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'excel',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success',
+                filename: 'Stock produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'csv',
+                text: 'CSV',
+                className: 'btn btn-sm btn-info',
+                filename: 'Stock produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'pdf',
+                text: 'PDF',
+                className: 'btn btn-sm btn-danger',
+                filename: 'Stock produits',
+                title: 'Stock des produits',
+                exportOptions: { columns: ':not(:last-child)' }
+            }
+        ]
+    });
+</script>
+
+{% endblock %}

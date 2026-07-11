@@ -1,0 +1,78 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Modifications d'un produit No {{ produit.code }}</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Voir la liste</a>
+    </div>
+    <div>
+
+        {{ form_start(form) }}
+        {#    {{ form_widget(form) }}#}
+        {#    {{ form_widget(form.nom) }}#}
+
+        <div>
+            <label for="">Designation</label>
+            {{ form_widget(form.designation, {'attr': {'class': 'form-input'}}) }}
+            {{ form_widget(form.code, {'attr': {'class': 'form-input', hidden:'true'}}) }}
+        </div>
+        <div>
+            <label for="">Categorie</label>
+            {{ form_widget(form.Categorie, {'attr': {'class': 'form-input'}}) }}
+
+        </div>
+        <div>
+            <label for="">Unité de Mesure</label>
+
+            {{ form_widget(form.uniteMesure, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Prix d'achat (FC)</label>
+            {{ form_widget(form.prixAchat, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Prix de vente (FC)</label>
+            {{ form_widget(form.prix, {'attr': {'class': 'form-input'}}) }}
+        </div>
+
+        <div>
+            <label for="">Quantité Minimale</label>
+
+            {{ form_widget(form.minimum, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Quantité Maximale</label>
+            {{ form_widget(form.maximum, {'attr': {'class': 'form-input'}}) }}
+        </div>
+{#        <div>#}
+{#            <label for="">Fabricant</label>#}
+{#            {{ form_widget(form.fabricant, {'attr': {'class': 'form-input'}}) }}#}
+
+{#        </div>#}
+        <div>
+            <label for="">Préemption</label>
+            {{ form_widget(form.preemption, {'attr': {'class': 'form-input', 'type': 'date'}}) }}
+        </div>
+        <div>
+            <label for="">Image du produit</label>
+            {% if produit.image %}
+                <div class="mb-2">
+                    <img src="{{ asset('uploads/produits/' ~ produit.image) }}"
+                         alt="{{ produit.designation }}"
+                         class="h-24 w-24 object-cover rounded border">
+                    <p class="text-xs text-gray-400 mt-1">Image actuelle — uploader une nouvelle pour la remplacer</p>
+                </div>
+            {% endif %}
+            {{ form_widget(form.imageFile, {'attr': {'class': 'form-input', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+            <p class="text-xs text-gray-400 mt-1">JPG, PNG ou WEBP — max 2 Mo</p>
+        </div>
+        <br>
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer les modifications') }}</button>
+        {{ form_end(form) }}
+
+    {{ include('produits/_delete_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}

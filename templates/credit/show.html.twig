@@ -1,0 +1,36 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Sortie de Caisse</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_credit_new') }}">Nouvelle sortie</a>
+
+    </div>
+    <div>
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>Montant</th>
+                <td>{{ credit.montant }}</td>
+            </tr>
+            <tr>
+                <th>Cree par</th>
+                <td>{{ credit.createdBy }}</td>
+            </tr>
+            <tr>
+                <th>Date creation</th>
+                <td>{{ credit.createdAt ? credit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_credit_index') }}">back to list</a>
+
+        <a href="{{ path('app_credit_edit', {'id': credit.id}) }}">edit</a>
+
+        {{ include('credit/_delete_form.html.twig') }}
+    </div>
+</div>
+
+
+{% endblock %}

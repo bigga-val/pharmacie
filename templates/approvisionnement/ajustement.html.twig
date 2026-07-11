@@ -1,0 +1,35 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel max-w-lg mx-auto">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-xl font-bold">Ajustement de stock</h1>
+        <a href="{{ path('app_approvisionnement_stock') }}" class="btn btn-outline-secondary btn-sm">Retour au stock</a>
+    </div>
+
+    <div class="mb-4 p-3 bg-warning/10 border border-warning rounded text-sm text-warning-dark">
+        Une quantité <strong>négative</strong> réduit le stock (perte, vol, etc.).<br>
+        Une quantité <strong>positive</strong> augmente le stock (correction à la hausse).
+    </div>
+
+    {{ form_start(form) }}
+
+    <div class="mb-3">
+        <label class="block mb-1 font-medium">Produit</label>
+        {{ form_widget(form.produit, {'attr': {'class': 'form-input'}}) }}
+    </div>
+
+    <div class="mb-3">
+        <label class="block mb-1 font-medium">Quantité</label>
+        {{ form_widget(form.qty, {'attr': {'class': 'form-input'}}) }}
+    </div>
+
+    <div class="mb-4">
+        <label class="block mb-1 font-medium">Motif</label>
+        {{ form_widget(form.motif, {'attr': {'class': 'form-input'}}) }}
+    </div>
+
+    <input type="submit" value="Enregistrer l'ajustement" class="btn btn-warning w-full">
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

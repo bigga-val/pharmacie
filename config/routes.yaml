@@ -1,0 +1,426 @@
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+
+index:
+    path: /dashboard
+    controller: App\Controller\DashboardController::index
+
+analytics:
+    path: /analytics
+    controller: App\Controller\DashboardController::analytics
+
+finance:
+    path: /finance
+    controller: App\Controller\DashboardController::finance
+
+crypto:
+    path: /crypto
+    controller: App\Controller\DashboardController::crypto
+
+
+
+
+app_chat:
+    path: /apps/chat
+    controller: App\Controller\AppsController::chat
+
+app_mailbox:
+    path: /apps/mailbox
+    controller: App\Controller\AppsController::mailbox
+
+app_todo_list:
+    path: /apps/todolist
+    controller: App\Controller\AppsController::todo_list
+
+app_notes:
+    path: /apps/notes
+    controller: App\Controller\AppsController::notes
+
+app_scrumboard:
+    path: /apps/scrumboard
+    controller: App\Controller\AppsController::scrumboard
+
+app_contacts:
+    path: /apps/contacts
+    controller: App\Controller\AppsController::contacts
+
+app_invoice_list:
+    path: /apps/invoice/list
+    controller: App\Controller\AppsController::invoice_list
+
+app_invoice_add:
+    path: /apps/invoice/add
+    controller: App\Controller\AppsController::invoice_add
+
+app_invoice_preview:
+    path: /apps/invoice/preview
+    controller: App\Controller\AppsController::invoice_preview
+
+app_invoice_edit:
+    path: /apps/invoice/edit
+    controller: App\Controller\AppsController::invoice_edit
+
+app_calendar:
+    path: /apps/calendar
+    controller: App\Controller\AppsController::calendar
+
+
+
+
+ui_components_tabs:
+    path: /components/tabs
+    controller: App\Controller\UIController::ui_components_tabs
+
+ui_components_accordions:
+    path: /components/accordions
+    controller: App\Controller\UIController::ui_components_accordions
+
+ui_components_modals:
+    path: /components/modals
+    controller: App\Controller\UIController::ui_components_modals
+
+ui_components_cards:
+    path: /components/cards
+    controller: App\Controller\UIController::ui_components_cards
+
+ui_components_carousel:
+    path: /components/carousel
+    controller: App\Controller\UIController::ui_components_carousel
+
+ui_components_countdown:
+    path: /components/countdown
+    controller: App\Controller\UIController::ui_components_countdown
+
+ui_components_counter:
+    path: /components/counter
+    controller: App\Controller\UIController::ui_components_counter
+
+ui_components_sweetalert:
+    path: /components/sweetalert
+    controller: App\Controller\UIController::ui_components_sweet_alert
+
+ui_components_timeline:
+    path: /components/timeline
+    controller: App\Controller\UIController::ui_components_timeline
+
+ui_components_notifications:
+    path: /components/notifications
+    controller: App\Controller\UIController::ui_components_notifications
+
+ui_components_media_object:
+    path: /components/media-object
+    controller: App\Controller\UIController::ui_components_media_object
+
+ui_components_list_group:
+    path: /components/list-group
+    controller: App\Controller\UIController::ui_components_list_group
+
+ui_components_pricing_table:
+    path: /components/pricing-table
+    controller: App\Controller\UIController::ui_components_pricing
+
+ui_components_lightbox:
+    path: /components/lightbox
+    controller: App\Controller\UIController::ui_components_lightbox
+
+
+
+
+ui_elements_alerts:
+    path: /elements/alerts
+    controller: App\Controller\UIController::elements_alerts
+
+ui_elements_avatar:
+    path: /elements/avatar
+    controller: App\Controller\UIController::elements_avatar
+
+ui_elements_badges:
+    path: /elements/badges
+    controller: App\Controller\UIController::elements_badges
+
+ui_elements_breadcrumbs:
+    path: /elements/breadcrumbs
+    controller: App\Controller\UIController::elements_breadcrumbs
+
+ui_elements_buttons:
+    path: /elements/buttons
+    controller: App\Controller\UIController::elements_buttons
+
+ui_elements_buttons_group:
+    path: /elements/buttons-group
+    controller: App\Controller\UIController::elements_button_group
+
+ui_elements_color_library:
+    path: /elements/color-library
+    controller: App\Controller\UIController::elements_color_library
+
+ui_elements_dropdown:
+    path: /elements/dropdown
+    controller: App\Controller\UIController::elements_dropdown
+
+ui_elements_infobox:
+    path: /elements/infobox
+    controller: App\Controller\UIController::elements_infobox
+
+ui_elements_jumbotron:
+    path: /elements/jumbotron
+    controller: App\Controller\UIController::elements_jumbotron
+
+ui_elements_loader:
+    path: /elements/loader
+    controller: App\Controller\UIController::elements_loader
+
+ui_elements_pagination:
+    path: /elements/pagination
+    controller: App\Controller\UIController::elements_pagination
+
+ui_elements_popovers:
+    path: /elements/popovers
+    controller: App\Controller\UIController::elements_popovers
+
+ui_elements_progress_bar:
+    path: /elements/progress-bar
+    controller: App\Controller\UIController::elements_progress_bar
+
+ui_elements_search:
+    path: /elements/search
+    controller: App\Controller\UIController::elements_search
+
+ui_elements_tooltips:
+    path: /elements/tooltips
+    controller: App\Controller\UIController::elements_tooltips
+
+ui_elements_treeview:
+    path: /elements/treeview
+    controller: App\Controller\UIController::elements_treeview
+
+ui_elements_typography:
+    path: /elements/typography
+    controller: App\Controller\UIController::elements_typography
+
+
+
+
+charts:
+    path: /charts
+    controller: App\Controller\UIController::charts
+
+widgets:
+    path: /widgets
+    controller: App\Controller\UIController::widgets
+
+font_icons:
+    path: /font-icons
+    controller: App\Controller\UIController::font_icons
+
+drag_and_drop:
+    path: /dragndrop
+    controller: App\Controller\UIController::drag_and_drop
+
+
+tables:
+    path: /tables
+    controller: App\Controller\TablesController::tables
+
+datatables_advanced:
+    path: /datatables/advanced
+    controller: App\Controller\TablesController::datatables_advanced
+
+datatables_alt_pagination:
+    path: /datatables/alt-pagination
+    controller: App\Controller\TablesController::datatables_alt_pagination
+
+datatables_basic:
+    path: /datatables/basic
+    controller: App\Controller\TablesController::datatables_basic
+
+datatables_checkbox:
+    path: /datatables/checkbox
+    controller: App\Controller\TablesController::datatables_checkbox
+
+datatables_clone_header:
+    path: /datatables/clone-header
+    controller: App\Controller\TablesController::datatables_clone_header
+
+datatables_column_chooser:
+    path: /datatables/column-chooser
+    controller: App\Controller\TablesController::datatables_column_chooser
+
+datatables_export:
+    path: /datatables/export
+    controller: App\Controller\TablesController::datatables_export
+
+datatables_multi_column:
+    path: /datatables/multi-column
+    controller: App\Controller\TablesController::datatables_multi_column
+
+datatables_multiple_tables:
+    path: /datatables/multiple-tables
+    controller: App\Controller\TablesController::datatables_multiple_tables
+
+datatables_order_sorting:
+    path: /datatables/order-sorting
+    controller: App\Controller\TablesController::datatables_order_sorting
+
+datatables_range_search:
+    path: /datatables/range-search
+    controller: App\Controller\TablesController::datatables_range_search
+
+datatables_skin:
+    path: /datatables/skin
+    controller: App\Controller\TablesController::datatables_skin
+
+datatables_sticky_header:
+    path: /datatables/sticky-header
+    controller: App\Controller\TablesController::datatables_sticky_header
+
+
+
+
+forms_basic:
+    path: /forms/basic
+    controller: App\Controller\FormsController::forms_basic
+
+forms_input_group:
+    path: /forms/input-group
+    controller: App\Controller\FormsController::forms_input_group
+
+forms_layouts:
+    path: /forms/layouts
+    controller: App\Controller\FormsController::forms_layouts
+
+forms_validation:
+    path: /forms/validation
+    controller: App\Controller\FormsController::forms_validation
+
+forms_input_mask:
+    path: /forms/input-mask
+    controller: App\Controller\FormsController::forms_input_mask
+
+forms_checkbox_radio:
+    path: /forms/checkbox-radio
+    controller: App\Controller\FormsController::forms_checkbox_radio
+
+forms_select2:
+    path: /forms/select2
+    controller: App\Controller\FormsController::forms_select2
+
+forms_touchspin:
+    path: /forms/touchspin
+    controller: App\Controller\FormsController::forms_touchspin
+
+forms_switches:
+    path: /forms/switches
+    controller: App\Controller\FormsController::forms_switches
+
+forms_wizards:
+    path: /forms/wizards
+    controller: App\Controller\FormsController::forms_wizards
+
+forms_file_upload:
+    path: /forms/file-upload
+    controller: App\Controller\FormsController::forms_file_upload
+
+forms_quill_editor:
+    path: /forms/quill-editor
+    controller: App\Controller\FormsController::forms_quill_editor
+
+forms_markdown_editor:
+    path: /forms/markdown-editor
+    controller: App\Controller\FormsController::forms_markdown_editor
+
+forms_date_picker:
+    path: /forms/date-picker
+    controller: App\Controller\FormsController::forms_date_picker
+
+forms_clipboard:
+    path: /forms/clipboard
+    controller: App\Controller\FormsController::forms_clipboard
+
+
+
+users_profile:
+    path: /users/profile
+    controller: App\Controller\UsersController::users_profile
+
+users_account_settings:
+    path: /users/user-account-settings
+    controller: App\Controller\UsersController::users_account_settings
+
+
+
+
+pages_knowledge_base:
+    path: /pages/knowledge-base
+    controller: App\Controller\PagesController::pages_knowledge_base
+
+pages_contact_us:
+    path: /pages/contact-us
+    controller: App\Controller\PagesController::pages_contact_us
+
+pages_faq:
+    path: /pages/faq
+    controller: App\Controller\PagesController::pages_faq
+
+pages_coming_soon:
+    path: /pages/coming-soon
+    controller: App\Controller\PagesController::pages_coming_soon
+
+pages_error404:
+    path: /pages/error404
+    controller: App\Controller\PagesController::pages_error404
+
+
+
+pages_error500:
+    path: /pages/error500
+    controller: App\Controller\PagesController::pages_error500
+
+pages_error503:
+    path: /pages/error503
+    controller: App\Controller\PagesController::pages_error503
+
+pages_maintenence:
+    path: /pages/maintenence
+    controller: App\Controller\PagesController::pages_maintenence
+
+
+
+
+
+
+auth_boxed_signin:
+    path: /auth/boxed-signin
+    controller: App\Controller\AuthController::auth_boxed_signin
+
+auth_boxed_signup:
+    path: /auth/boxed-signup
+    controller: App\Controller\AuthController::auth_boxed_signup
+
+auth_boxed_lockscreen:
+    path: /auth/boxed-lockscreen
+    controller: App\Controller\AuthController::auth_boxed_lockscreen
+
+auth_boxed_password_reset:
+    path: /auth/boxed-password-reset
+    controller: App\Controller\AuthController::auth_boxed_password_reset
+
+auth_cover_login:
+    path: /auth/cover-login
+    controller: App\Controller\AuthController::auth_cover_login
+
+auth_cover_register:
+    path: /auth/cover-register
+    controller: App\Controller\AuthController::auth_cover_register
+
+auth_cover_lockscreen:
+    path: /auth/cover-lockscreen
+    controller: App\Controller\AuthController::auth_cover_lockscreen
+
+auth_cover_password_reset:
+    path: /auth/cover-password-reset
+    controller: App\Controller\AuthController::auth_cover_password_reset
+
+
+

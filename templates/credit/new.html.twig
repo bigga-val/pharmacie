@@ -1,0 +1,103 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+
+    <div class="panel">
+        <div class="flex justify-between mb-3">
+            <h1>Nouvelle Sortie de Caisse</h1>
+{#            <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_credit_new') }}">Nouvelle sortie</a>#}
+            <h3>Taux: 1$ = {{ (app.session.get('tauxactif')) }} Fc</h3>
+
+        </div>
+        <div>
+            <form action="" method="POST">
+                <div>
+                    <label for="devise">Devise</label>
+                    <select class="form-input" name="devise" id="devise">
+                        <option value="FC">FC</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="">Montant</label>
+                    <input type="number" id="montant" name="montant" inputmode="decimal" class="form-input">
+                </div>
+                <div>
+                    <label for="">Raison</label>
+                    {#                {{ form_widget(form.raison, {'attr': {'class': 'form-input'}}) }}#}
+                    <textarea name="raison" id="raison" cols="30" class="form-input" rows="5"></textarea>
+                </div>
+
+                <br>
+                <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+                {#    {{ include('credit/_form.html.twig') }}#}
+
+            </form>
+
+        </div>
+    </div>
+    <div class="panel mt-3">
+        <div class="flex justify-between mb-3">
+            <h1>Recentes Sorties de Caisse</h1>
+
+        </div>
+        <br>
+        <div>
+{#            <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
+
+            <table id="datatable" class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Montant</th>
+                    <th>Cree Par</th>
+                    <th>Raison</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for credit in credits %}
+                    <tr>
+                        <td>#</td>
+                        <td>{{ credit.dateCredit ? credit.createdAt|date('d-m-Y H:m') : '' }}</td>
+                        <td>{{ credit.montant|number_format(0, ',', ' ') ~ ' ' ~ (credit.devise ?? 'FC') }}</td>
+                        <td>{{ credit.createdBy }}</td>
+                        <td>{{ credit.raison }}</td>
+                        <td>
+                            <a href="{{ path('app_credit_show', {'id': credit.id}) }}">show</a>
+                            <a href="{{ path('app_credit_edit', {'id': credit.id}) }}">edit</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">no records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+
+
+    <script>
+        let table = new DataTable('#datatable', {
+           order: [[1, 'desc']],
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ ligne par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+    </script>
+{% endblock %}
+

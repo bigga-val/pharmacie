@@ -1,0 +1,184 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="flex flex-wrap items-center justify-between mb-4 gap-4">
+    <h1 class="text-2xl font-bold">Bilan de Caisse</h1>
+    <div class="flex gap-3">
+        <div class="panel py-2 px-4 flex flex-col items-center">
+            <span class="text-xs text-gray-400 mb-1">Solde cumulé FC</span>
+            <span class="text-xl font-bold {{ soldeGlobalFC >= 0 ? 'text-success' : 'text-danger' }}">
+                {{ soldeGlobalFC|number_format(2, ',', ' ') }} FC
+            </span>
+        </div>
+        <div class="panel py-2 px-4 flex flex-col items-center">
+            <span class="text-xs text-gray-400 mb-1">Solde cumulé USD</span>
+            <span class="text-xl font-bold {{ soldeGlobalUSD >= 0 ? 'text-success' : 'text-danger' }}">
+                {{ soldeGlobalUSD|number_format(2, ',', ' ') }} $
+            </span>
+        </div>
+    </div>
+</div>
+
+{# Filtre par période #}
+<div class="panel mb-4">
+    <form method="get" action="" class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">Début</label>
+            <input type="date" name="date1" value="{{ debut|date('Y-m-d') }}" class="form-input">
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium">Fin</label>
+            <input type="date" name="date2" value="{{ fin|date('Y-m-d') }}" class="form-input">
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Appliquer</button>
+            <a href="{{ path('app_caisse_index', {
+                'date1': 'yesterday'|date('Y-m-d'),
+                'date2': 'yesterday'|date('Y-m-d')
+            }) }}" class="btn btn-outline-secondary">Hier</a>
+            <a href="{{ path('app_caisse_index', {
+                'date1': 'now'|date('Y-m-01'),
+                'date2': 'now'|date('Y-m-t')
+            }) }}" class="btn btn-outline-secondary">Mois courant</a>
+            {% if debut or fin %}
+                <a href="{{ path('app_caisse_index') }}" class="btn btn-outline-danger">Tout le temps</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{# Résumé #}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+
+    {# ENTRÉES #}
+    <div class="panel">
+        <h2 class="text-lg font-semibold text-success mb-3">Entrées de caisse</h2>
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th class="text-left">Catégorie</th>
+                    <th class="text-right">FC</th>
+                    <th class="text-right">USD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="{{ path('app_vente_index') }}" class="text-primary hover:underline">Ventes encaissées</a></td>
+                    <td class="text-right">{{ ventes.FC|number_format(2, ',', ' ') }}</td>
+                    <td class="text-right text-gray-400">—</td>
+                </tr>
+                <tr>
+                    <td><a href="{{ path('app_debit_index') }}" class="text-primary hover:underline">Débits (entrées manuelles)</a></td>
+                    <td class="text-right">{{ debits.FC|number_format(2, ',', ' ') }}</td>
+                    <td class="text-right">{{ debits.USD|number_format(2, ',', ' ') }}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="font-bold border-t-2">
+                    <td>Total entrées</td>
+                    <td class="text-right text-success">{{ totalEntreesFC|number_format(2, ',', ' ') }} FC</td>
+                    <td class="text-right text-success">{{ totalEntreesUSD|number_format(2, ',', ' ') }} $</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    {# SORTIES #}
+    <div class="panel">
+        <h2 class="text-lg font-semibold text-danger mb-3">Sorties de caisse</h2>
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th class="text-left">Catégorie</th>
+                    <th class="text-right">FC</th>
+                    <th class="text-right">USD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="{{ path('app_credit_index') }}" class="text-primary hover:underline">Crédits (sorties manuelles)</a></td>
+                    <td class="text-right">{{ credits.FC|number_format(2, ',', ' ') }}</td>
+                    <td class="text-right">{{ credits.USD|number_format(2, ',', ' ') }}</td>
+                </tr>
+                <tr>
+                    <td><a href="{{ path('app_paie_index') }}" class="text-primary hover:underline">Salaires</a></td>
+                    <td class="text-right">{{ salaires|number_format(2, ',', ' ') }}</td>
+                    <td class="text-right text-gray-400">—</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="font-bold border-t-2">
+                    <td>Total sorties</td>
+                    <td class="text-right text-danger">{{ totalSortiesFC|number_format(2, ',', ' ') }} FC</td>
+                    <td class="text-right text-danger">{{ totalSortiesUSD|number_format(2, ',', ' ') }} $</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+{# SOLDE NET PÉRIODE #}
+<div class="panel mb-4">
+    <h2 class="text-lg font-semibold mb-3">Solde net — période filtrée</h2>
+    <div class="flex gap-6 flex-wrap">
+        <div class="flex flex-col items-center p-4 rounded-lg border-2 {{ soldeFC >= 0 ? 'border-success bg-success/10' : 'border-danger bg-danger/10' }}">
+            <span class="text-sm text-gray-500 mb-1">Solde FC</span>
+            <span class="text-2xl font-bold {{ soldeFC >= 0 ? 'text-success' : 'text-danger' }}">
+                {{ soldeFC|number_format(2, ',', ' ') }} FC
+            </span>
+        </div>
+        <div class="flex flex-col items-center p-4 rounded-lg border-2 {{ soldeUSD >= 0 ? 'border-success bg-success/10' : 'border-danger bg-danger/10' }}">
+            <span class="text-sm text-gray-500 mb-1">Solde USD</span>
+            <span class="text-2xl font-bold {{ soldeUSD >= 0 ? 'text-success' : 'text-danger' }}">
+                {{ soldeUSD|number_format(2, ',', ' ') }} $
+            </span>
+        </div>
+        <div class="flex items-center text-sm text-gray-400 self-end pb-2">
+            {% if debut or fin %}
+                Période : {{ debut ? debut|date('d/m/Y') : '…' }} → {{ fin ? fin|date('d/m/Y') : 'aujourd\'hui' }}
+            {% else %}
+                Tout l'historique
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# MARGE BÉNÉFICIAIRE #}
+<div class="panel">
+    <h2 class="text-lg font-semibold mb-4">Marge bénéficiaire — ventes payées</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+        <div class="panel bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <div class="text-xs font-semibold uppercase opacity-80 mb-1">Chiffre d'affaires</div>
+            <div class="text-2xl font-bold">{{ marge.chiffreAffaires|number_format(0, ',', ' ') }}</div>
+            <div class="text-xs opacity-70 mt-1">FC — ventes encaissées</div>
+        </div>
+        <div class="panel bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <div class="text-xs font-semibold uppercase opacity-80 mb-1">Coût d'achat</div>
+            <div class="text-2xl font-bold">{{ marge.coutAchats|number_format(0, ',', ' ') }}</div>
+            <div class="text-xs opacity-70 mt-1">FC — prix d'achat moyen</div>
+        </div>
+        <div class="panel bg-gradient-to-r {{ marge.marge >= 0 ? 'from-emerald-500 to-emerald-600' : 'from-red-500 to-red-600' }} text-white">
+            <div class="text-xs font-semibold uppercase opacity-80 mb-1">Marge brute</div>
+            <div class="text-2xl font-bold">{{ marge.marge|number_format(0, ',', ' ') }}</div>
+            <div class="text-xs opacity-70 mt-1">FC — CA − Coût</div>
+        </div>
+        <div class="panel bg-gradient-to-r {{ marge.tauxMarge >= 20 ? 'from-teal-500 to-teal-600' : (marge.tauxMarge >= 0 ? 'from-amber-500 to-amber-600' : 'from-red-500 to-red-600') }} text-white">
+            <div class="text-xs font-semibold uppercase opacity-80 mb-1">Taux de marge</div>
+            <div class="text-2xl font-bold">{{ marge.tauxMarge }} %</div>
+            <div class="text-xs opacity-70 mt-1">Marge / CA</div>
+        </div>
+    </div>
+    {% if marge.chiffreAffaires > 0 %}
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+        <div class="h-3 rounded-full {{ marge.tauxMarge >= 20 ? 'bg-emerald-500' : (marge.tauxMarge >= 0 ? 'bg-amber-500' : 'bg-red-500') }}"
+             style="width: {{ marge.tauxMarge > 100 ? 100 : marge.tauxMarge }}%"></div>
+    </div>
+    <p class="text-xs text-gray-400 mt-1">
+        Sur {{ marge.chiffreAffaires|number_format(0, ',', ' ') }} FC de ventes, {{ marge.marge|number_format(0, ',', ' ') }} FC de marge ({{ marge.tauxMarge }} %)
+    </p>
+    {% else %}
+    <p class="text-gray-400 text-sm">Aucune vente payée sur cette période.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

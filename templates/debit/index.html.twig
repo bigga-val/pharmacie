@@ -1,0 +1,85 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <div class="panel">
+        <div class="panel-body">
+            <form action="" class="flex d-flex inline-block">
+                <div class="form-group p-2">
+                    <label for="start">Debut</label>
+                    <input type="date" name="start" class="form-input">
+                </div>
+
+                <div class="form-group p-2">
+                    <label for="end">Fin</label>
+                    <input type="date" name="end" class="form-input" value="{{ end|date('d-m-Y') }}">
+                </div>
+                <div class="form-group p-2">
+                    <label for=""> -</label>
+                    <input type="submit" value="Rechercher" class="btn btn-primary">
+                </div>
+                <div class="form-group p-2">
+                    <label for=""> -</label>
+                    <a href="{{ path("app_produit_vendu_index") }}" class="btn btn-primary"> Rafraichir</a>
+                </div>
+            </form>
+        </div>
+    </div>
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Entrée de Caisse du {{ start|date('d-m-Y H:i:s') }} au {{ end|date('d-m-Y  H:i:s') }}</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_debit_new') }}">Nouvelle Entrée</a>
+
+    </div>
+    <div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Montant</th>
+                <th>Raison</th>
+                <th>OPS</th>
+                <th>Date OPS</th>
+                <th>Date Entrée</th>
+                <th>Taux</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% set counter = 0 %}
+            {%  set totalUSD = 0 %}
+            {%  set totalFC = 0 %}
+
+        {% for debit in debits %}
+            {% set counter = counter + 1 %}
+            {% if debit.devise == "FC" %}
+                {% set totalFC = totalFC + debit.montant %}
+            {% elseif debit.devise == "USD" %}
+                {% set totalUSD = totalUSD + debit.montant %}
+            {% endif %}
+            <tr>
+                <td>{{ counter }}</td>
+                <td>{{ debit.montant | number_format(0, ',', ' ') ~' '~ debit.devise}}</td>
+                <td>{{ debit.raison }}</td>
+                <td>{{ debit.createdBy }}</td>
+                <td>{{ debit.createdAt ? debit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ debit.DateDebit ? debit.DateDebit|date('Y-m-d') : '' }}</td>
+                <td>{{ debit.taux }}</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_devis_pdf', {'id': debit.id}) }}">Imprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <h2>Total: {{ totalUSD }} USD | {{ totalFC }} FC</h2>
+        </tfoot>
+    </table>
+
+    </div>
+</div>
+{% endblock %}

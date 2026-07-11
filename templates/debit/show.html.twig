@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<title>Debit</title>
+
+{% block body %}
+    <h1>Debit</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ debit.id }}</td>
+            </tr>
+            <tr>
+                <th>Montant</th>
+                <td>{{ debit.montant }}</td>
+            </tr>
+            <tr>
+                <th>Raison</th>
+                <td>{{ debit.raison }}</td>
+            </tr>
+            <tr>
+                <th>CreatedBy</th>
+                <td>{{ debit.createdBy }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ debit.createdAt ? debit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateDebit</th>
+                <td>{{ debit.DateDebit ? debit.DateDebit|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Taux</th>
+                <td>{{ debit.taux }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_debit_index') }}">back to list</a>
+
+    <a href="{{ path('app_debit_edit', {'id': debit.id}) }}">edit</a>
+
+    {{ include('debit/_delete_form.html.twig') }}
+{% endblock %}

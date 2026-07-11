@@ -1,0 +1,913 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+<div x-data="{ activeTab: 'intro' }">
+
+    {# Breadcrumb #}
+    <ul class="flex space-x-2 rtl:space-x-reverse mb-5">
+        <li><a href="{{ path('app_dashboard') }}" class="text-primary hover:underline">Accueil</a></li>
+        <li class="before:content-['/'] ltr:before:mr-1 rtl:before:ml-1"><span>Documentation</span></li>
+    </ul>
+
+    {# En-tête #}
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold">Manuel Utilisateur</h2>
+        <p class="text-white-dark mt-1">Guide complet d'utilisation de la plateforme · Version 1.0</p>
+    </div>
+
+    {# Grille des modules (accès rapide) #}
+    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+
+        <button @click="activeTab = 'ventes'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'ventes' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" fill="currentColor"/><path d="M8 12H16M8 8H16M8 16H13" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p class="text-xs font-semibold">Ventes</p>
+        </button>
+
+        <button @click="activeTab = 'produits'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'produits' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V6.31673C14.3804 6.60867 15.75 7.83361 15.75 9.5C15.75 9.91421 15.4142 10.25 15 10.25C14.5858 10.25 14.25 9.91421 14.25 9.5C14.25 8.82154 13.6859 8.10339 12.75 7.84748V11.3167C14.3804 11.6087 15.75 12.8336 15.75 14.5C15.75 16.1664 14.3804 17.3913 12.75 17.6833V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V17.6833C9.61957 17.3913 8.25 16.1664 8.25 14.5C8.25 14.0858 8.58579 13.75 9 13.75C9.41421 13.75 9.75 14.0858 9.75 14.5C9.75 15.1785 10.3141 15.8966 11.25 16.1525V12.6833C9.61957 12.3913 8.25 11.1664 8.25 9.5C8.25 7.83361 9.61957 6.60867 11.25 6.31673V6C11.25 5.58579 11.5858 5.25 12 5.25Z" fill="currentColor"/></svg>
+            <p class="text-xs font-semibold">Produits</p>
+        </button>
+
+        <button @click="activeTab = 'commandes'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'commandes' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor"/><ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3" fill="currentColor"/><circle cx="9.00098" cy="6" r="4" fill="currentColor"/><ellipse cx="9.00098" cy="17.001" rx="7" ry="4" fill="currentColor"/></svg>
+            <p class="text-xs font-semibold">Commandes</p>
+        </button>
+
+        <button @click="activeTab = 'stock'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'stock' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z" fill="currentColor"/><path d="M9 17.25C8.58579 17.25 8.25 17.5858 8.25 18C8.25 18.4142 8.58579 18.75 9 18.75H15C15.4142 18.75 15.75 18.4142 15.75 18C15.75 17.5858 15.4142 17.25 15 17.25H9Z" fill="currentColor"/></svg>
+            <p class="text-xs font-semibold">Stock</p>
+        </button>
+
+        <button @click="activeTab = 'caisse'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'caisse' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M4 18V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path opacity="0.5" d="M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M20 6H4M20 18H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 6V18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p class="text-xs font-semibold">Caisse</p>
+        </button>
+
+        <button @click="activeTab = 'rh'"
+            class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
+            :class="activeTab === 'rh' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/><ellipse opacity="0.5" cx="12" cy="17" rx="7" ry="4" stroke="currentColor" stroke-width="1.5"/></svg>
+            <p class="text-xs font-semibold">RH & Paie</p>
+        </button>
+
+    </div>
+
+    {# Navigation onglets #}
+    <div class="border-b border-[#ebedf2] dark:border-[#191e3a] mb-5 overflow-x-auto">
+        <ul class="flex flex-nowrap text-center font-semibold text-sm whitespace-nowrap gap-1">
+            <li><button @click="activeTab = 'intro'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'intro' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Introduction</button></li>
+            <li><button @click="activeTab = 'connexion'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'connexion' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Connexion</button></li>
+            <li><button @click="activeTab = 'dashboard'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'dashboard' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Dashboard</button></li>
+            <li><button @click="activeTab = 'ventes'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'ventes' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Ventes</button></li>
+            <li><button @click="activeTab = 'produits'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'produits' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Produits</button></li>
+            <li><button @click="activeTab = 'commandes'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'commandes' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Commandes</button></li>
+            <li><button @click="activeTab = 'stock'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'stock' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Stock</button></li>
+            <li><button @click="activeTab = 'caisse'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'caisse' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Caisse</button></li>
+            <li><button @click="activeTab = 'rh'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'rh' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">RH & Paie</button></li>
+            <li><button @click="activeTab = 'admin'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'admin' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Administration</button></li>
+            <li><button @click="activeTab = 'roles'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'roles' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Rôles</button></li>
+            <li><button @click="activeTab = 'faq'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'faq' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">FAQ</button></li>
+        </ul>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : INTRODUCTION #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'intro'">
+        <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-6 mb-4">
+            <h3 class="text-lg font-bold mb-4">Bienvenue sur Afya</h3>
+            <p class="text-white-dark mb-4">
+                <strong class="text-black dark:text-white">Afya</strong> est une application de gestion d'entreprise complète.
+                Elle couvre l'ensemble des opérations quotidiennes : ventes, stocks, commandes, trésorerie, ressources humaines et administration.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Ventes & facturation avec export PDF</span>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Commandes avec workflow d'approbation</span>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Approvisionnement & suivi des stocks</span>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Caisse & trésorerie FC / USD</span>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Gestion des employés & de la paie</span>
+                </div>
+                <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
+                    <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-sm font-semibold text-primary">Taux de change & gestion des tables</span>
+                </div>
+            </div>
+            <div class="mt-5 flex items-center gap-2 p-3 rounded-md bg-info/10 border border-info/20">
+                <svg class="w-4 h-4 text-info shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="text-sm text-info font-semibold">L'application supporte deux devises : le <strong>Franc Congolais (FC)</strong> et le <strong>Dollar Américain (USD)</strong>.</span>
+            </div>
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : CONNEXION #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'connexion'" x-cloak>
+        <div class="space-y-4" x-data="{ active: null }">
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Se connecter</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark">
+                        <ol class="list-decimal list-inside space-y-2 text-sm">
+                            <li>Ouvrez l'application dans votre navigateur.</li>
+                            <li>Saisissez votre <strong class="text-black dark:text-white">nom d'utilisateur</strong> et votre <strong class="text-black dark:text-white">mot de passe</strong>.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Se connecter</span>.</li>
+                        </ol>
+                        <div class="mt-3 flex items-center gap-2 p-3 rounded-md bg-warning/10 border border-warning/20 text-sm text-warning">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Si vous n'avez pas de compte, contactez votre administrateur.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Se déconnecter</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        Cliquez sur votre nom ou l'icône de profil en haut à droite, puis sélectionnez <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Se déconnecter</span>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Première connexion</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        Lors de votre première connexion, l'application peut vous demander de configurer votre session. Suivez les instructions affichées à l'écran.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : DASHBOARD #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'dashboard'" x-cloak>
+        <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-6 mb-4">
+            <div class="flex items-center gap-2 mb-4">
+                <h3 class="text-base font-bold">Tableau de bord</h3>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Tous les rôles</span>
+            </div>
+            <p class="text-white-dark text-sm mb-5">Page d'accueil de l'application. Affiche une synthèse en temps réel de l'activité de l'entreprise.</p>
+
+            <h4 class="font-bold text-sm mb-3">Indicateurs clés (KPI)</h4>
+            <div class="table-responsive mb-5">
+                <table class="table-hover">
+                    <thead><tr><th>Indicateur</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td class="font-semibold">CA Hier</td><td class="text-white-dark">Chiffre d'affaires réalisé la veille, avec variation en %</td></tr>
+                        <tr><td class="font-semibold">CA du mois</td><td class="text-white-dark">Chiffre d'affaires cumulé du mois en cours</td></tr>
+                        <tr><td class="font-semibold">Transactions du mois</td><td class="text-white-dark">Nombre de ventes effectuées ce mois</td></tr>
+                        <tr><td class="font-semibold">Commandes en attente</td><td class="text-white-dark">Commandes fournisseurs en attente d'approbation</td></tr>
+                        <tr><td class="font-semibold">Masse salariale</td><td class="text-white-dark">Total des salaires versés ce mois</td></tr>
+                        <tr><td class="font-semibold">Flux de trésorerie</td><td class="text-white-dark">Solde global crédits / débits</td></tr>
+                        <tr><td class="font-semibold">Employés</td><td class="text-white-dark">Nombre total d'employés actifs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 class="font-bold text-sm mb-3">Graphiques disponibles</h4>
+            <ul class="space-y-2 text-sm text-white-dark">
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 7.757 8.586 6.343 10z"/></svg><span><strong class="text-black dark:text-white">Tendance des revenus (6 mois)</strong> — courbe d'évolution du CA</span></li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 7.757 8.586 6.343 10z"/></svg><span><strong class="text-black dark:text-white">Ventes journalières</strong> — graphique en barres jour par jour</span></li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 7.757 8.586 6.343 10z"/></svg><span><strong class="text-black dark:text-white">Top 5 des produits</strong> — les produits les plus vendus</span></li>
+            </ul>
+
+            <div class="mt-4 flex items-center gap-2 p-3 rounded-md bg-primary/10 border border-primary/20 text-sm text-primary">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Le lien <strong>Finance</strong> (admin uniquement) donne accès à des analyses avancées : tendances journalières, hebdomadaires, mensuelles et annuelles.
+            </div>
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : VENTES #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'ventes'" x-cloak>
+        <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-1 mb-1">
+            <div class="flex items-center gap-2 p-5 pb-0">
+                <h3 class="text-base font-bold">Ventes & Facturation</h3>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Tous les rôles</span>
+            </div>
+        </div>
+        <div class="space-y-3 mt-3" x-data="{ active: null }">
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Créer une nouvelle vente</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5 mb-3">
+                            <li>Menu latéral → <strong class="text-black dark:text-white">Vente → Vendre</strong></li>
+                            <li>Remplissez le formulaire :</li>
+                        </ol>
+                        <div class="table-responsive mb-3">
+                            <table class="table-hover">
+                                <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="font-semibold">Table</td><td>Table du client (si applicable)</td></tr>
+                                    <tr><td class="font-semibold">Devise</td><td>FC ou USD</td></tr>
+                                    <tr><td class="font-semibold">Produit</td><td>Rechercher et sélectionner un produit</td></tr>
+                                    <tr><td class="font-semibold">Quantité</td><td>Quantité vendue</td></tr>
+                                    <tr><td class="font-semibold">Prix unitaire</td><td>Renseigné automatiquement</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ol class="list-decimal list-inside space-y-1.5" start="3">
+                            <li>Ajoutez autant de lignes que nécessaire.</li>
+                            <li>Vérifiez le total, puis cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                        <p class="mt-2 text-xs text-info">Le numéro de facture est généré automatiquement (ex : V00001, V00002…)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Confirmer une vente (marquer comme payée)</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Vente → Factures</strong>.</li>
+                            <li>Trouvez la vente concernée.</li>
+                            <li>Cliquez sur <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Confirmer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Annuler une vente</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5 mb-3">
+                            <li>Allez dans <strong class="text-black dark:text-white">Vente → Factures</strong>.</li>
+                            <li>Trouvez la vente, puis cliquez sur <span class="inline-block bg-danger/10 text-danger text-xs font-bold px-2 py-0.5 rounded">Annuler</span>.</li>
+                        </ol>
+                        <div class="flex items-center gap-2 p-2 rounded bg-danger/10 border border-danger/20 text-danger text-xs">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Une vente annulée ne peut pas être relancée. Créez une nouvelle vente si nécessaire.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 4 }" x-on:click="active === 4 ? active = null : active = 4">
+                    <span>Imprimer / Exporter une facture en PDF</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 4 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 4" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Vente → Factures</strong>.</li>
+                            <li>Cliquez sur la vente souhaitée.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Imprimer</span> ou <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Télécharger PDF</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 5 }" x-on:click="active === 5 ? active = null : active = 5">
+                    <span>Historique des ventes & filtres</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 5 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 5" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Allez dans <strong class="text-black dark:text-white">Vente → Historique</strong> pour voir tous les articles vendus (date, produit, quantité, prix).</p>
+                        <p>Utilisez les champs <strong class="text-black dark:text-white">Date de début</strong> et <strong class="text-black dark:text-white">Date de fin</strong> pour filtrer sur une période, puis cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Filtrer</span>.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : PRODUITS #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'produits'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2 mb-1">
+                    <h3 class="text-base font-bold">Gestion des Produits</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin & Vendeur</span>
+                </div>
+                <p class="text-white-dark text-sm">Gérez le catalogue de produits, les catégories et les niveaux de stock.</p>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Ajouter un nouveau produit</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Allez dans <strong class="text-black dark:text-white">Produit → Nouveau Produit</strong>, remplissez le formulaire :</p>
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead><tr><th>Champ</th><th>Description</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="font-semibold">Nom</td><td>Nom du produit</td></tr>
+                                    <tr><td class="font-semibold">Catégorie</td><td>Catégorie associée</td></tr>
+                                    <tr><td class="font-semibold">Prix de vente</td><td>Prix unitaire de vente</td></tr>
+                                    <tr><td class="font-semibold">Unité de mesure</td><td>Ex : pièce, kg, litre…</td></tr>
+                                    <tr><td class="font-semibold">Stock min / max</td><td>Seuils d'alerte et de capacité</td></tr>
+                                    <tr><td class="font-semibold">Image</td><td>Photo du produit (optionnel)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-2 text-xs text-info">Le code produit est généré automatiquement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Exporter les produits en Excel</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        Dans <strong class="text-black dark:text-white">Produit → Liste</strong>, cliquez sur le bouton <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Exporter Excel</span> pour télécharger la liste complète.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Gérer les catégories de produits <span class="text-xs font-normal text-white-dark">(Admin)</span></span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p>Allez dans <strong class="text-black dark:text-white">Catégorie Produit → Nouvelle Catégorie</strong>, saisissez le nom et cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</p>
+                        <p class="mt-2 text-xs text-info">Vous pouvez aussi créer une catégorie directement depuis la liste via le formulaire intégré en haut de page.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : COMMANDES #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'commandes'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-base font-bold">Commandes Fournisseurs</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Tous les rôles</span>
+                </div>
+                <p class="text-white-dark text-sm mb-4">Cycle de vie d'une commande :</p>
+                <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+                    <span class="px-3 py-1.5 rounded-full bg-[#f1f2f3] dark:bg-[#1b2e4b] text-black dark:text-white">Brouillon</span>
+                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <span class="px-3 py-1.5 rounded-full bg-warning/10 text-warning">Soumise</span>
+                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <span class="px-3 py-1.5 rounded-full bg-success/10 text-success">Approuvée</span>
+                    <span class="text-gray-400">/</span>
+                    <span class="px-3 py-1.5 rounded-full bg-danger/10 text-danger">Rejetée</span>
+                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    <span class="px-3 py-1.5 rounded-full bg-info/10 text-info">Réceptionnée</span>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Créer une commande</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Commande Produit → Commander</strong>.</li>
+                            <li>Ajoutez les lignes : produit, quantité, prix unitaire.</li>
+                            <li>Cliquez sur <span class="inline-block bg-[#f1f2f3] dark:bg-[#1b2e4b] text-xs font-bold px-2 py-0.5 rounded">Enregistrer en brouillon</span> ou <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Soumettre</span> directement.</li>
+                        </ol>
+                        <p class="mt-2 text-xs text-info">Numéro de commande généré automatiquement (ex : COM00001).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Approuver ou rejeter une commande <span class="text-xs font-normal text-white-dark">(Approbateurs)</span></span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Commande Produit → Historique</strong>.</li>
+                            <li>Trouvez la commande avec le statut <span class="inline-block bg-warning/10 text-warning text-xs font-bold px-2 py-0.5 rounded">Soumise</span>.</li>
+                            <li>Cliquez sur <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Approuver</span> ou <span class="inline-block bg-danger/10 text-danger text-xs font-bold px-2 py-0.5 rounded">Rejeter</span>.</li>
+                        </ol>
+                        <p class="mt-2 text-xs text-warning">Vous devez être dans la liste des approbateurs. Contactez un admin si besoin.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Réceptionner une commande</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Ouvrez la commande <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Approuvée</span>.</li>
+                            <li>Dans la section <strong class="text-black dark:text-white">Réception</strong>, confirmez les quantités reçues.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Confirmer la réception</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 4 }" x-on:click="active === 4 ? active = null : active = 4">
+                    <span>Gérer les approbateurs <span class="text-xs font-normal text-white-dark">(Admin)</span></span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 4 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 4" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        Allez dans <strong class="text-black dark:text-white">Commande Produit → Approbateur</strong> pour ajouter ou retirer des utilisateurs de la liste des approbateurs.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : STOCK #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'stock'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-bold">Approvisionnement & Stock</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Ajouter du stock (approvisionner)</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Approvisionnement → Approvisionner</strong>.</li>
+                            <li>Remplissez : produit, quantité, prix unitaire, date.</li>
+                            <li>Le coût total est calculé automatiquement (qté × prix).</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Ajustement de stock</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm space-y-3">
+                        <p>L'ajustement permet de <strong class="text-black dark:text-white">corriger manuellement le niveau de stock</strong> sans passer par un achat fournisseur (pertes, vol, inventaire physique, etc.).</p>
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Approvisionnement → Ajustement stock</strong>.</li>
+                            <li>Sélectionnez le produit à ajuster.</li>
+                            <li>Saisissez la quantité : <strong class="text-black dark:text-white">négative</strong> pour réduire le stock, <strong class="text-black dark:text-white">positive</strong> pour l'augmenter.</li>
+                            <li>Choisissez le motif dans la liste.</li>
+                            <li>Cliquez sur <span class="inline-block bg-warning/10 text-warning text-xs font-bold px-2 py-0.5 rounded">Enregistrer l'ajustement</span>.</li>
+                        </ol>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="p-2 rounded bg-[#f8f9fa] dark:bg-[#1a2035] border border-[#ebedf2] dark:border-[#191e3a]">
+                                <p class="font-bold text-black dark:text-white mb-1">Motifs disponibles</p>
+                                <ul class="list-disc list-inside space-y-0.5 text-white-dark">
+                                    <li>Correction inventaire</li>
+                                    <li>Perte</li>
+                                    <li>Vol</li>
+                                    <li>Produit avarié</li>
+                                    <li>Retour client</li>
+                                    <li>Autre</li>
+                                </ul>
+                            </div>
+                            <div class="p-2 rounded bg-warning/10 border border-warning/20 text-warning">
+                                <p class="font-bold mb-1">À noter</p>
+                                <p>Les ajustements apparaissent dans l'historique avec le badge <span class="font-bold">Ajustement</span> (orange) pour les distinguer des approvisionnements réels.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Voir les niveaux de stock actuels</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Allez dans <strong class="text-black dark:text-white">Approvisionnement → Stock</strong>. Utilisez les filtres de date pour analyser sur une période.</p>
+                        <div class="flex items-center gap-2 p-2 rounded bg-danger/10 border border-danger/20 text-danger text-xs">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Les produits sous le seuil minimum apparaissent en rouge.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : CAISSE #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'caisse'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-bold">Caisse & Trésorerie</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
+                </div>
+                <p class="text-white-dark text-sm mt-2">Suivi des entrées et sorties de trésorerie en FC et USD.</p>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Bilan de caisse</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-3">Allez dans <strong class="text-black dark:text-white">Caisse → Bilan de caisse</strong>. Le solde est affiché par devise (FC et USD).</p>
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead><tr><th>Section</th><th>Contenu</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="font-semibold text-success">Entrées</td><td>Ventes + débits enregistrés</td></tr>
+                                    <tr><td class="font-semibold text-danger">Sorties</td><td>Crédits + salaires versés</td></tr>
+                                    <tr><td class="font-semibold">Solde</td><td>Entrées − Sorties</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Enregistrer une entrée de caisse (Débit)</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Un <strong class="text-black dark:text-white">débit</strong> = entrée d'argent autre que les ventes (ex : apport de fonds, remboursement reçu).</p>
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Caisse → Nouvelle Entrée</strong>.</li>
+                            <li>Remplissez : montant, devise, motif, date.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Enregistrer une sortie de caisse (Crédit)</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Un <strong class="text-black dark:text-white">crédit</strong> = sortie d'argent (ex : achat fournitures, frais divers).</p>
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Caisse → Nouvelle Sortie</strong>.</li>
+                            <li>Remplissez : montant, devise, motif, date.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : RH & PAIE #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'rh'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-bold">Ressources Humaines & Paie</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Ajouter un employé</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <p class="mb-2">Allez dans <strong class="text-black dark:text-white">Employe → Nouvel Employé</strong> et remplissez : nom, prénom, poste, date d'embauche, salaire de base, devise (FC/USD).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Payer le salaire d'un employé</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5 mb-3">
+                            <li>Ouvrez la fiche de l'employé.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Payer le salaire</span>.</li>
+                            <li>Sélectionnez la période de paie et confirmez.</li>
+                        </ol>
+                        <div class="flex items-center gap-2 p-2 rounded bg-danger/10 border border-danger/20 text-danger text-xs">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                            Le système empêche de payer deux fois le même employé pour la même période.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Créer une période de paie</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Employe → Listes des Frais</strong>.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Nouvelle Période</span>.</li>
+                            <li>Saisissez le nom (ex : "Mars 2026") et les dates.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : ADMINISTRATION #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'admin'" x-cloak>
+        <div class="space-y-3" x-data="{ active: null }">
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
+                <div class="flex items-center gap-2">
+                    <h3 class="text-base font-bold">Administration</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
+                </div>
+                <p class="text-white-dark text-sm mt-1">Gestion des utilisateurs, taux de change et tables.</p>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span>Créer un utilisateur</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Utilisateur → Nouvel Utilisateur</strong>.</li>
+                            <li>Remplissez : nom, adresse e-mail, mot de passe, rôle.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span>Mettre à jour le taux de change</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        <ol class="list-decimal list-inside space-y-1.5 mb-3">
+                            <li>Allez dans <strong class="text-black dark:text-white">Taux → Taux Récents</strong>.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Nouveau Taux</span>.</li>
+                            <li>Saisissez le taux (ex : 1 USD = 2800 FC) et marquez-le comme actif.</li>
+                        </ol>
+                        <p class="text-xs text-info">Un seul taux peut être actif à la fois. L'ancien est automatiquement désactivé.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Gérer les tables (restaurant / bar)</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm">
+                        Allez dans <strong class="text-black dark:text-white">Tables → Tables</strong> pour voir, ajouter, modifier ou supprimer des tables. Chaque table peut être associée à une vente.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : RÔLES #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'roles'" x-cloak>
+        <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-6 mb-4">
+            <h3 class="text-base font-bold mb-4">Rôles & Permissions</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4">
+                    <h4 class="font-bold text-sm mb-2">Utilisateur standard</h4>
+                    <ul class="space-y-1 text-sm text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ventes & factures</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Commandes fournisseurs</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Catalogue produits</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Caisse / Employés / Admin</li>
+                    </ul>
+                </div>
+                <div class="border border-info/40 rounded-md p-4 bg-info/5">
+                    <h4 class="font-bold text-sm mb-2 text-info">Vendeur (ROLE_USER)</h4>
+                    <ul class="space-y-1 text-sm text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ventes & factures</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Catalogue produits (lecture)</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Caisse / Finances / Admin</li>
+                    </ul>
+                </div>
+                <div class="border border-primary/40 rounded-md p-4 bg-primary/5">
+                    <h4 class="font-bold text-sm mb-2 text-primary">Administrateur</h4>
+                    <ul class="space-y-1 text-sm text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Accès complet à tout</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Gestion utilisateurs & employés</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Caisse & finances avancées</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Configuration complète</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4 class="font-bold text-sm mb-3">Tableau détaillé des accès</h4>
+            <div class="table-responsive">
+                <table class="table-hover">
+                    <thead>
+                        <tr>
+                            <th>Fonctionnalité</th>
+                            <th class="text-center">Vendeur</th>
+                            <th class="text-center">Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ventes & factures</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Produits & catégories</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Approvisionnement & stock</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Tableau de bord</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Caisse & trésorerie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Employés & paie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Taux de change</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Gestion utilisateurs</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Crédits & Débits</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# ═══════════════════════════════════════ #}
+    {# ONGLET : FAQ #}
+    {# ═══════════════════════════════════════ #}
+    <div x-show="activeTab === 'faq'" x-cloak>
+        <div class="space-y-5" x-data="{ active: null }">
+            <h3 class="text-lg font-bold">Questions <span class="text-primary">fréquentes</span></h3>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 rounded-t-md cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
+                    <span class="text-primary">Je ne vois pas le menu "Produit" dans la barre latérale.</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 1" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Le menu Produits est accessible à tous les utilisateurs connectés (Vendeur et Admin).
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
+                    <span class="text-primary">Je ne peux pas approuver une commande.</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 2" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Pour approuver des commandes, vous devez être ajouté à la liste des approbateurs par un administrateur via <strong class="text-black dark:text-white">Commande Produit → Approbateur</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span class="text-primary">Le système indique que le salaire a déjà été payé pour cette période.</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Le système empêche les doublons de paiement de salaire. Si une erreur a été commise, contactez votre administrateur.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 4 }" x-on:click="active === 4 ? active = null : active = 4">
+                    <span class="text-primary">Comment savoir si le stock d'un produit est insuffisant ?</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 4 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 4" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Dans <strong class="text-black dark:text-white">Approvisionnement → Stock</strong>, les produits dont le stock est en dessous du seuil minimum sont mis en évidence en rouge.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 5 }" x-on:click="active === 5 ? active = null : active = 5">
+                    <span class="text-primary">Puis-je modifier une facture après confirmation ?</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 5 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 5" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Non. Une fois confirmée, une facture ne peut plus être modifiée. Annulez-la et créez une nouvelle vente si nécessaire.
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 6 }" x-on:click="active === 6 ? active = null : active = 6">
+                    <span class="text-primary">Comment changer le taux de change ?</span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 6 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 6" x-collapse>
+                    <div class="p-5 text-white-dark font-semibold text-sm">
+                        Allez dans <strong class="text-black dark:text-white">Taux → Taux Récents</strong>, créez un nouveau taux et marquez-le comme actif. L'ancien taux sera automatiquement désactivé.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

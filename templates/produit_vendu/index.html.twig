@@ -1,0 +1,125 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <div class="panel-body">
+        <form action="" class="flex d-flex inline-block">
+            <div class="form-group p-2">
+                <label for="start">Debut</label>
+                <input type="date" name="start" class="form-input" value="{{ start|date('Y-m-d') }}">
+            </div>
+
+            <div class="form-group p-2">
+                <label for="end">Fin</label>
+                <input type="date" name="end" class="form-input" value="{{ end|date('Y-m-d') }}">
+            </div>
+            <div class="form-group p-2">
+                <label for=""> -</label>
+                <input type="submit" value="Rechercher" class="btn btn-primary">
+            </div>
+            <div class="form-group p-2">
+                <label for=""> -</label>
+                <a href="{{ path("app_produit_vendu_index") }}" class="btn btn-primary"> Rafraichir</a>
+            </div>
+        </form>
+    </div>
+</div>
+<link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Liste des Produits vendus du {{ start|date('d-m-Y H:i:s') }} au {{ end|date('d-m-Y  H:i:s') }}</h1>
+        <div id="export-buttons"></div>
+    </div>
+
+    <table id="datatable" class="table">
+        <thead>
+            <tr>
+                <th>Vente No</th>
+                <th>Produit</th>
+                <th>Qty</th>
+                <th>Prix</th>
+                <th>Total</th>
+                <th>Date et heure</th>
+                <th>Ops</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+        {% set total = 0 %}
+        {% set grandtotal = 0 %}
+
+        {% for produit_vendu in produit_vendus %}
+            <tr>
+                <td>{{ produit_vendu.vente ? produit_vendu.vente.numeroVente : '-' }}</td>
+                <td>{{ produit_vendu.produit.designation }}</td>
+                <td>{{ produit_vendu.qty }}</td>
+                <td>{{ produit_vendu.prixUnitaire }}</td>
+                {% set total = produit_vendu.prixUnitaire * produit_vendu.qty  %}
+                {% set grandtotal = grandtotal + total %}
+                <td>{{ total }}</td>
+                <td>{{ produit_vendu.createdAt ? produit_vendu.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ produit_vendu.createdby }}</td>
+                <td>
+{#                    <a href="{{ path('app_produit_vendu_show', {'id': produit_vendu.id}) }}">show</a>#}
+{#                    <a href="{{ path('app_produit_vendu_edit', {'id': produit_vendu.id}) }}">edit</a>#}
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+<strong>Grand-Total: {{ grandtotal }}</strong>
+    </div>
+{#    <a href="{{ path('app_produit_vendu_new') }}">Create new</a>#}
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+    <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+    <script>
+        let table = new DataTable('#datatable', {
+            dom: '<"flex justify-between"lf>rtip',
+            initComplete: function () {
+                this.api().buttons().container().appendTo('#export-buttons');
+            },
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ ligne par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: 'Copier',
+                    className: 'btn btn-sm btn-secondary',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    className: 'btn btn-sm btn-success',
+                    filename: 'Historique des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-sm btn-info',
+                    filename: 'Historique des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    className: 'btn btn-sm btn-danger',
+                    filename: 'Historique des ventes',
+                    title: 'Historique des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                }
+            ]
+        });
+    </script>
+
+    {% endblock %}

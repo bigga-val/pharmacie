@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+
+<title>New Taux</title>
+
+{% block body %}
+    <h1>Create new Taux</h1>
+
+    {{ include('taux/_form.html.twig') }}
+
+    <a href="{{ path('app_taux_index') }}">back to list</a>
+{% endblock %}

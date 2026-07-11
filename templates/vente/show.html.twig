@@ -1,0 +1,363 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <style>
+        @media print {
+
+            body * {
+                visibility: hidden !important;
+            }
+
+            #printable, #printZone * {
+                visibility: visible !important;
+            }
+
+            #printable {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .print-only {
+                display: inline-block !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+<div class="panel" id="printable">
+    <div class="flex justify-items-center mt-3">
+        <input type="hidden" value="{{ vente.id }}" name="venteID" id="venteID">
+        <a target="_blank" href="{{ path('app_generate_pdf', {'id': vente.id}) }}" class="btn btn-success mr-2">Imprimer</a>
+        <button id="btn-print" class="btn btn-success mr-2">Imprimer</button>
+        {#        <a href="{{ path('app_generate_pdf', {'id': vente.id}) }}" class="btn btn-success mr-2">PDF</a>#}
+
+        {% if(vente.statusVente == 'progress') %}
+            <a id="btnConfirm" href="{{ path('app_vente_confirm', {'id': vente.id}) }}" class="btn btn-success mr-2">Confirmer paiement</a>
+            <a id="btnCancel" href="{{ path('app_vente_cancel', {'id': vente.id}) }}" class="btn btn-outline-danger">Annuler</a>
+        {% else %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% if(vente.statusVente == 'paid') %}
+                    <a id="btnCancel" href="{{ path('app_vente_cancel', {'id': vente.id}) }}" class="btn btn-outline-danger">Annuler</a>
+                {% elseif(vente.statusVente != 'paid') %}
+                    <a id="btnConfirm" href="{{ path('app_vente_confirm', {'id': vente.id}) }}" class="btn btn-success mr-2">Confirmerdd paiement</a>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="flex justify-between mb-3">
+        <h2>
+            Details de la facture No {{ vente.numeroVente }} Par {{ vente.createdBy }} le {{ vente.createdAt ? vente.createdAt|date('d-m-Y H:i:s') : '' }}
+        </h2>
+        <h2>
+            Status :
+            {% if(vente.statusVente == "progress") %}
+                <span class="text-primary">{{ vente.statusVente | upper }}</span>
+
+            {% elseif(vente.statusVente == "paid") %}
+                <span class="text-success">{{ vente.statusVente | upper }}</span>
+
+            {% elseif(vente.statusVente == "canceled") %}
+                <span class="text-danger">{{ vente.statusVente | upper }}</span>
+
+            {% endif %}
+        </h2>
+    </div>
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Produit</th>
+                    <th>Quantite</th>
+                    <th>Prix</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="tbody">
+            {% set counter = 0 %}
+            {% set total = 0 %}
+           {% for produit in produitsVendu %}
+               {% set counter = counter+1 %}
+               {% set total = total + (produit.qty * produit.prixUnitaire) %}
+               <tr>
+                   <td>{{ counter }}</td>
+                   <td>{{ produit.produit.designation }}</td>
+
+                   <td>{{ produit.qty }}</td>
+                   <td>{{ produit.prixUnitaire }}</td>
+                   <td>{{ produit.qty * produit.produit.prix }}</td>
+                   <td>
+                       {% if (vente.statusVente == "paid") and is_granted('ROLE_ADMIN') %}
+                       <button id="{{ produit.id }}" class="remove-old-row btn btn-danger btn-sm">X</button>
+                       {% elseif (vente.statusVente == "progress") %}
+                           <button id="{{ produit.id }}" class="remove-old-row btn btn-danger btn-sm">X</button>
+                       {% endif %}
+{#                       <span class="badge bg-primary">{{ produit.id }}</span>#}
+                   </td>
+               </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <span>Total : {{ total }}</span>
+        <hr>
+{#        <a href="{{ path('app_vente_index') }}">back to list</a>#}
+
+
+        {#        {{ include('vente/_delete_form.html.twig') }}#}
+
+        <span id="errorSpan" class="text-danger"></span>
+
+        <div class="flex">
+            {% if (vente.statusVente == "paid") and is_granted('ROLE_ADMIN') %}
+                <button id="add-row" class="btn btn-primary mr-2">Ajouter</button>
+                <button id="saveNewLines" class="btn btn-primary">Enregistrer</button>
+            {% elseif (vente.statusVente == "progress") %}
+                <button id="add-row" class="btn btn-primary mr-2">Ajouter</button>
+                <button id="saveNewLines" class="btn btn-primary">Enregistrer</button>
+            {% endif %}
+
+        </div>
+    </div>
+    <div class="printable">
+
+    </div>
+</div>
+    <script src="{{ asset("assets/js/jquery.min.js") }}"></script>
+    <script>
+        $(document).ready(function() {
+
+            $("#btnCancel").click(function(event) {
+                if (confirm("Êtes-vous sûr(e) de vouloir Annuler la facture ?")) {
+                } else {
+                    event.preventDefault();  // User clicked "Non" (No), prevent default behavior
+                }
+            });
+
+            $("#btnConfirm").click(function(event) {
+                if (confirm("Êtes-vous sûr(e) de vouloir Confirmer la facture ?")) {
+                } else {
+                    event.preventDefault();  // User clicked "Non" (No), prevent default behavior
+                }
+            });
+
+            // Ajouter une ligne
+            let counter = 0
+            var newRow = '<tr class="prod_Line">'+
+                '<td><select class="form-input select2- item-product" name="select-'+counter+'">' +
+                '<option value="-1">Choisir un produit</option>'+
+                    {% for produit in produits %}
+                '<option value="{{ produit.produitID }}">{{ produit.designation }}</option>'+
+                    {% endfor %}
+                '</select></td>'+
+                '   <td><input placeholder="Quantite" type="number" class="form-input item-quantity" ></td>'+
+                '   <td>Stock:<span class="item-dispo"></span><span class="item-unit"></span></td>'+
+
+                '   <td>Prix<input type="number" class="form-input item-prix" readonly="true">' +
+                //'   <td>' +
+                //'<span class="item-unit">-</span>' +
+                //'<span class="item-min hidden d-none"></span>' +
+                //'<span class="item-max hidden d-none"></span>' +
+                //'</td>'+
+                '   <td><span class="item-total">0</span></td>'+
+                '   <td><button class="remove-row btn btn-danger btn-sm">X</button></td>'+
+                '</tr>'
+            //$('.tbody').append(newRow);
+            //console.log(newRow)
+            $('#add-row').click(function() {
+                counter++
+                $('.tbody').append(newRow);
+                setPrix()
+            });
+            // Supprimer une ligne
+            $('table').on('click', '.remove-row', function() {
+                counter--
+                $(this).closest('tr').remove();
+                //setting the subtotal and total when removed an invoice line
+                let subtotal = 0
+                $('.item-total').each(function(i, e){
+                    subtotal = subtotal+ parseFloat($(this).text())
+                })
+                $('#subtotal').text(subtotal)
+            });
+
+            //supprimer les lignes enregistrees deja
+            $('table').on('click', '.remove-old-row', function() {
+                if(confirm("Voulez-vous vraiment supprimer cette ligne de la facture ?")) {
+                    counter--
+                    $(this).closest('tr').remove();
+                    //alert($(this).prop('id'))
+                    let ligneID = $(this).prop('id')
+                    $.ajax({
+                        url: '/produit/vendu/jsonDeleteLigneVente?' +
+                            'ligneID=' +ligneID,
+                        method: 'GET',
+                        data: {
+                        },
+                        success: function (response) {
+                            //console.log("bien ajoute")
+                            // console.log(response)
+                            raiseToastr('success', 'Retrait éffectué avec succès !')
+                            //-- On reload l'app apres l'enregistrement des produits vendu
+                            location.reload()
+                        },
+                        error: function (e) {
+                            console.log('Erreur lors de la requête AJAX.');
+                            console.log(e)
+                            // Autres actions à effectuer en cas d'erreur
+                        }
+                    })
+                } else {
+                }
+
+
+            });
+
+            $("#saveNewLines").on("click", function(){
+                $(".tbody").find("tr").each(function(e, i){
+                    let venteID = $("#venteID").val()
+                    let productID = $(this).find("td").eq(0).find(".item-product").val()
+                    let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                    // let price = $(this).find("td").eq(2).find(".item-prix").val()
+
+                    if(productID != -1){
+                        // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                        $.ajax({
+                            url: '/produit/vendu/jsonSaveLigneVente?' +
+                                'venteID=' +venteID+
+                                '&produitID='+ productID+
+                                '&qty='+ quantity,
+                            method: 'GET',
+                            data: {
+                            },
+                            success: function (response) {
+                                //console.log("bien ajoute")
+                                // console.log(response)
+                                raiseToastr('success', 'Vente éffectuée avec succès !')
+                                //-- On reload l'app apres l'enregistrement des produits vendu
+                                location.reload()
+                            },
+                            error: function (e) {
+                                console.log('Erreur lors de la requête AJAX.');
+                                console.log(e)
+                                // Autres actions à effectuer en cas d'erreur
+                            }
+                        })
+                    }
+                })
+            })
+
+            function setPrix(){
+                let selectElement = $('select[name^="select-"]');
+                $(".item-product").each(function(i, e){
+                    $(this).on("change", function(e){
+                        //alert($(this).val())
+                        if($(this).val() != -1){
+
+                            let qty = $(this).parent("td").siblings("td").children(".item-quantity")
+
+                            let amount = $(this).parent("td").siblings("td").children(".item-prix")
+                            let totalAmount = $(this).parent("td").siblings("td").children(".item-total")
+                            let unit = $(this).parent("td").siblings("td").children(".item-unit")
+                            let min = $(this).parent("td").siblings("td").children(".item-min")
+                            let max = $(this).parent("td").siblings("td").children(".item-max")
+                            let reserve = $(this).parent("td").siblings("td").children(".item-reserve")
+                            let dispo = $(this).parent("td").siblings("td").children(".item-dispo")
+                            let reel = 0
+                            $.ajax({
+                                url: '/vente/jsonGetProduct2?',// +
+                                //'productID=' + $(this).val(),
+                                method: 'GET',
+                                data: {
+                                    productID: $(this).val(),
+                                },
+                                success: function (response) {
+                                    console.log(response)
+                                    var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
+                                    var tr = response["data"][0]["totalReserve"] != null?response["data"][0]["totalReserve"]:0
+                                    var te = response["data"][0]["totalEntree"] != null? response["data"][0]["totalEntree"]:0
+
+                                    reel = te-(tr+ts)
+                                    if(isNaN(reel)){
+                                        reel = 0
+                                    }else{
+
+                                    }
+                                    console.log(te, ts, tr, reel)
+                                    console.log(response["data"][0]["prix"])
+                                    amount.val(response["data"][0]["prix"])
+                                    unit.text(response["data"][0]["uniteMesure"])
+                                    min.text(response["data"][0]["minimum"])
+                                    max.text(response["data"][0]["maximum"])
+                                    dispo.text(reel)
+                                    // qty.attr('readonly', false)
+                                    // qty.val(1)
+                                    // totalAmount.text(response["prix"])
+                                    // --- Set the subtotal value --- \\
+                                    let subtotal = 0
+                                    $('.item-total').each(function(i, e){
+                                        subtotal = subtotal+ parseFloat($(this).text())
+                                    })
+
+                                    $('#subtotal').text(subtotal)
+                                    setTotal()
+                                },
+                                error: function (xhr, status, error) {
+                                    // Message renvoyé par le serveur
+                                    let message = xhr.responseText;
+
+                                    // Affichage simple
+                                    console.log(error);
+
+                                    // Ou dans une div
+                                    //$('#error-message').text(message).show();
+                                }
+                                //let qty = $(this).parent("td").siblings("td").children("input[x-model='item.quantity']")
+                            })
+
+                            qty.on("keyup", function(e){
+                                //console.log($(this).val(), min.text(), max.text())
+                                if($(this).val() <= 0 ) {
+                                    $("#btnSaveInvoice").prop("disabled", true)
+
+                                    $("#errorSpan").text("Valeur incorrecte fournie")
+                                }else if($(this).val() > parseFloat(dispo.text())) {
+
+                                    $("#errorSpan").text("Valeur maximale depassee: "+ dispo.text())
+
+
+                                }else{
+                                    $("#btnSaveInvoice").prop("disabled", false)
+                                    $("#btnSaveInvoice2").prop("disabled", false)
+                                    $("#btnSaveInvoicePrint").prop("disabled", false)
+                                    $("#errorSpan").text("")
+
+                                    let total = amount.val() * $(this).val()
+                                    totalAmount.text(total)
+                                    $(".item-total").each(function(i, e){
+                                        let subtotal = 0
+                                        $('.item-total').each(function(i, e){
+                                            subtotal = subtotal+ parseFloat($(this).text())
+                                        })
+                                        $('#subtotal').text(subtotal)
+                                        setTotal()
+                                    })
+                                }
+                            })
+
+                        }
+                    })
+                })
+
+            }
+            $("#btn-print").on('click', function(e){
+                window.print()
+            })
+        })
+
+    </script>
+
+{% endblock %}

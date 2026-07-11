@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche de paie — {{ employe.nomcomplet }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; font-size: 13px; color: #222; padding: 32px; background: #fff; }
+
+        /* ── En-tête ── */
+        .header-table { width: 100%; border-bottom: 3px solid #4361ee; padding-bottom: 16px; margin-bottom: 24px; }
+        .header-table td { vertical-align: middle; }
+        .brand { display: flex; align-items: center; }
+        .brand-name { font-size: 20px; font-weight: bold; color: #1e1b4b; margin-left: 10px; }
+        .brand-sub { font-size: 11px; color: #888; margin-left: 10px; margin-top: 2px; }
+        .doc-label { text-align: right; }
+        .doc-label h1 { font-size: 22px; font-weight: bold; text-transform: uppercase; color: #4361ee; letter-spacing: 1px; }
+        .doc-label p { font-size: 12px; color: #555; margin-top: 3px; }
+
+        /* ── Sections ── */
+        .section { margin-bottom: 22px; }
+        .section-title {
+            background: #4361ee;
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Infos employé (table 2 colonnes) ── */
+        .info-table { width: 100%; }
+        .info-table td { padding: 4px 8px; font-size: 13px; vertical-align: top; }
+        .info-label { color: #666; width: 140px; }
+        .info-value { font-weight: bold; color: #222; }
+
+        /* ── Tableau rémunération ── */
+        .pay-table { width: 100%; border-collapse: collapse; }
+        .pay-table th {
+            background: #1e1b4b;
+            color: white;
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .pay-table td { padding: 9px 12px; border-bottom: 1px solid #eef0f4; font-size: 13px; }
+        .pay-table tr:last-child td { border-bottom: none; }
+        .text-right { text-align: right; }
+        .row-alt { background: #f8f9ff; }
+        .row-net { background: #4361ee; color: white; font-weight: bold; font-size: 14px; }
+        .row-net td { padding: 11px 12px; }
+
+        /* ── Signatures ── */
+        .sig-table { width: 100%; margin-top: 50px; }
+        .sig-table td { text-align: center; width: 50%; padding: 0 30px; vertical-align: bottom; }
+        .sig-line { border-top: 1px solid #aaa; padding-top: 6px; font-size: 12px; color: #555; margin-top: 45px; }
+
+        /* ── Footer ── */
+        .doc-footer { margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; font-size: 11px; color: #aaa; }
+
+        /* ── Boutons (non-PDF) ── */
+        .no-print { margin-bottom: 24px; display: flex; gap: 10px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn-dark  { background: #1e1b4b; color: white; }
+        .btn-blue  { background: #4361ee; color: white; }
+        .btn-gray  { background: #6b7280; color: white; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    {% if not isPdf|default(false) %}
+    <div class="no-print">
+        <button onclick="window.print()" class="btn btn-dark">Imprimer</button>
+        <a href="{{ path('app_employe_fiche_paie_pdf', {'id': paieEmploye.id}) }}" class="btn btn-blue">Télécharger PDF</a>
+        <a href="{{ path('app_employe_payer', {'id': employe.id}) }}" class="btn btn-gray">Retour</a>
+    </div>
+    {% endif %}
+
+    {# ── En-tête ── #}
+    <table class="header-table">
+        <tr>
+            <td style="width:55%;">
+                {% if logoBase64 is defined and logoBase64 %}
+                    <img src="{{ logoBase64 }}" alt="Insoft Afya" style="height:48px; width:auto; vertical-align:middle;" />
+                {% endif %}
+                <span class="brand-name" style="vertical-align:middle;">Insoft Afya</span>
+            </td>
+            <td class="doc-label">
+                <h1>Fiche de Paie</h1>
+                <p>Période : <strong>{{ paieEmploye.paie.label }}</strong></p>
+                <p>Date d'émission : {{ paieEmploye.createdAt ? paieEmploye.createdAt|date('d/m/Y') : '' }}</p>
+            </td>
+        </tr>
+    </table>
+
+    {# ── Infos employé ── #}
+    <div class="section">
+        <div class="section-title">Informations de l'employé</div>
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Nom complet</td>
+                <td class="info-value">{{ employe.nomcomplet }}</td>
+                <td class="info-label">Matricule</td>
+                <td class="info-value">{{ employe.matricule }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Titre / Poste</td>
+                <td class="info-value">{{ employe.titre }}</td>
+                <td class="info-label">Catégorie</td>
+                <td class="info-value">{{ employe.categorie }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Date d'embauche</td>
+                <td class="info-value">{{ employe.dateembauche ? employe.dateembauche|date('d/m/Y') : '—' }}</td>
+                <td class="info-label">Salaire journalier</td>
+                <td class="info-value">{{ employe.salaireJournalier|number_format(2) }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {# ── Détail de la rémunération ── #}
+    <div class="section">
+        <div class="section-title">Détail de la rémunération</div>
+        <table class="pay-table">
+            <thead>
+                <tr>
+                    <th>Rubrique</th>
+                    <th>Détail</th>
+                    <th class="text-right">Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Salaire de base</td>
+                    <td>{{ paieEmploye.nbJours }} jour(s) × {{ employe.salaireJournalier|number_format(2) }}</td>
+                    <td class="text-right">{{ paieEmploye.salaireBase|number_format(2) }}</td>
+                </tr>
+                {% if paieEmploye.primes > 0 %}
+                <tr class="row-alt">
+                    <td>Primes</td>
+                    <td>—</td>
+                    <td class="text-right" style="color:#16a34a;">+ {{ paieEmploye.primes|number_format(2) }}</td>
+                </tr>
+                {% endif %}
+                {% if paieEmploye.deductions > 0 %}
+                <tr>
+                    <td>Déductions</td>
+                    <td>—</td>
+                    <td class="text-right" style="color:#dc2626;">- {{ paieEmploye.deductions|number_format(2) }}</td>
+                </tr>
+                {% endif %}
+                <tr class="row-net">
+                    <td colspan="2">NET À PAYER</td>
+                    <td class="text-right">{{ paieEmploye.total|number_format(2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {# ── Signatures ── #}
+    <table class="sig-table">
+        <tr>
+            <td><div class="sig-line">Signature de l'employé</div></td>
+            <td><div class="sig-line">Signature de l'employeur</div></td>
+        </tr>
+    </table>
+
+    {# ── Footer ── #}
+    <div class="doc-footer">
+        Insoft Afya — Document généré le {{ "now"|date("d/m/Y") }}
+    </div>
+
+</body>
+</html>

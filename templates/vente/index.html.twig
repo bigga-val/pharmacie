@@ -1,0 +1,128 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+
+        <h1>Liste des ventes</h1>
+
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            <a class="border border-2 p-2 text-white rounded bg-primary" href="{{ path('app_vente_new') }}">Nouvelle vente</a>
+        </div>
+
+{#        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>#}
+    </div>
+    <div>
+{#        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">#}
+
+        <table id="datatable" class="table display">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>No Facture</th>
+                <th>Total(Fc)</th>
+                <th>Total($)</th>
+                <th>Taux</th>
+                <th>Date Vente</th>
+                <th>Ops</th>
+                <th>Status</th>
+                <th>actions</th>
+            </tr>
+            </thead>
+            <tbody id="myTable">
+            {% set counter = 0 %}
+            {% for vente in ventes %}
+                {% set counter = counter + 1 %}
+                <tr>
+                    <td>{{ counter }}</td>
+                    <td>{{ vente.numeroVente }}</td>
+                    <td>Fc {{ vente.montant }}</td>
+                    <td>$ {{ vente.convert|number_format(2) }}</td>
+                    <td>{{ vente.taux }}</td>
+                    <td>{{ vente.createdAt ? vente.createdAt|date('d-m-Y H:i:s') : '' }}</td>
+                    <td>{{ vente.createdBy }}</td>
+                    <td>
+{#                        {{ vente.statusVente }}#}
+                        {% if(vente.statusVente == "progress") %}
+                            <span class="text-primary">{{ vente.statusVente | capitalize }}</span>
+
+                        {% elseif(vente.statusVente == "paid") %}
+                            <span class="text-success">{{ vente.statusVente | capitalize }}</span>
+
+                        {% elseif(vente.statusVente == "canceled") %}
+                            <span class="text-danger">{{ vente.statusVente | capitalize }}</span>
+
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_vente_show', {'id': vente.id}) }}" class="btn btn-primary btn-sm">Details</a>
+{#                        <a href="{{ path('app_vente_edit', {'id': vente.id}) }}">edit</a>#}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+    <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+
+    <script>
+        let table = new DataTable('#datatable', {
+            dom: '<"flex justify-between"lf>rtip',
+            initComplete: function () {
+                this.api().buttons().container().appendTo('#export-buttons');
+            },
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'Aucune ligne trouvee',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ lignes par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: 'Copier',
+                    className: 'btn btn-sm btn-secondary',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    className: 'btn btn-sm btn-success',
+                    filename: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-sm btn-info',
+                    filename: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                },
+                {
+                    extend: 'pdf',
+                    text: 'PDF',
+                    className: 'btn btn-sm btn-danger',
+                    filename: 'Liste des ventes',
+                    title: 'Liste des ventes',
+                    exportOptions: { columns: ':not(:last-child)' }
+                }
+            ],
+        });
+    </script>
+
+{% endblock %}

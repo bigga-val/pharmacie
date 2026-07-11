@@ -1,0 +1,134 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+<div class="panel">
+    <div class="flex justify-between items-center mb-4">
+        <h1>Approvisionnements</h1>
+        <div class="flex gap-2 items-center">
+            <div id="export-buttons"></div>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-warning" href="{{ path('app_approvisionnement_ajustement') }}">Ajustement stock</a>
+            <a class="btn btn-primary" href="{{ path('app_approvisionnement_new') }}">Approvisionner</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="overflow-x-auto w-full">
+    <table id="datatable" class="table display w-full">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Code</th>
+                <th>Désignation</th>
+                <th>Qté</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                <th>Coût unitaire (Fc)</th>
+                <th>Coût total (Fc)</th>
+                <th>Coût ($)</th>
+                <th>Taux</th>
+                {% endif %}
+                <th>Date</th>
+                <th>Opérateur</th>
+                {% if is_granted('ROLE_ADMIN') %}<th>Actions</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for appro in approvisionnements %}
+            {% if appro.taux is not null and appro.taux != 0 %}
+                {% set convert = appro.cout / appro.taux %}
+            {% else %}
+                {% set convert = 0 %}
+            {% endif %}
+            <tr>
+                <td>
+                    {% if appro.type == 'ajustement' %}
+                        <span class="badge bg-warning">Ajustement</span>
+                    {% else %}
+                        <span class="badge bg-info">Appro.</span>
+                    {% endif %}
+                </td>
+                <td>{{ appro.produit.code }}</td>
+                <td>{{ appro.produit.designation }}</td>
+                <td>{{ appro.qty }} {{ appro.produit.uniteMesure }}</td>
+                {% if is_granted('ROLE_ADMIN') %}
+                <td>Fc {{ appro.qty > 0 ? (appro.cout / appro.qty)|number_format(0, ',', ' ') : '—' }}</td>
+                <td>Fc {{ appro.cout|number_format(0, ',', ' ') }}</td>
+                <td>$ {{ convert|number_format(2) }}</td>
+                <td>{{ appro.taux }}</td>
+                {% endif %}
+                <td data-order="{{ appro.createdAt ? appro.createdAt|date('Y-m-d H:i:s') : '' }}">
+                    {{ appro.createdAt ? appro.createdAt|date('d/m/Y H:i') : '—' }}
+                </td>
+                <td>{{ appro.createdBy|capitalize }}</td>
+                {% if is_granted('ROLE_ADMIN') %}
+                <td>
+                    <a class="btn btn-sm btn-primary" href="{{ path('app_approvisionnement_edit', {'id': appro.id}) }}">Éditer</a>
+                </td>
+                {% endif %}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="11" class="text-center">Aucun approvisionnement trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+
+<script>
+    let table = new DataTable('#datatable', {
+        order: [[8, 'desc']],
+        dom: '<"flex justify-between"lf>rtip',
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        },
+        buttons: [
+            {
+                extend: 'copy',
+                text: 'Copier',
+                className: 'btn btn-sm btn-secondary',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'excel',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success',
+                filename: 'Approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'csv',
+                text: 'CSV',
+                className: 'btn btn-sm btn-info',
+                filename: 'Approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'pdf',
+                text: 'PDF',
+                className: 'btn btn-sm btn-danger',
+                filename: 'Approvisionnements',
+                title: 'Liste des approvisionnements',
+                exportOptions: { columns: ':not(:last-child)' }
+            }
+        ]
+    });
+</script>
+
+{% endblock %}

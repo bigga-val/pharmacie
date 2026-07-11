@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<title>Taux</title>
+
+{% block body %}
+    <h1>Taux</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ taux.id }}</td>
+            </tr>
+            <tr>
+                <th>Cout</th>
+                <td>{{ taux.cout }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ taux.createdAt ? taux.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_taux_index') }}">back to list</a>
+
+    <a href="{{ path('app_taux_edit', {'id': taux.id}) }}">edit</a>
+
+    {{ include('taux/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+    <form method="POST">
+        <div >
+            <label for="">Nouveau mot de passe *</label>
+            <input type="text" placeholder="Entrez le nouveau mot de passe" class="form-input" name="nouveau" id="nouveau">
+        </div>
+        <div >
+            <label for="">Confirmer mot de passe *</label>
+            <input required type="text" placeholder="Confirmez le nouveau mot de passe" class="form-input" name="confirme" id="confirme">
+        </div>
+        <div>
+            <br>
+            <input required type="submit" id="btnResetPassword" class="btn btn-success m-2" value="Confirmer">
+            <br>
+            <a  href="{{ path("app_user_index") }}" class="border-danger text-danger rounded border border-2 m-2 p-2">Voir la liste</a>
+            <a  href="{{ path("app_user_profile", {"id":app.request.get('id') }) }}" class="border-danger text-danger rounded border border-2 m-2 p-2">Voir le profile</a>
+        </div>
+    </form>
+    <script src="{{ asset("assets/js/jquery.min.js") }}"></script>
+    <script>
+        $(document).ready(function(e){
+            let nouveauElt = $("#nouveau")
+            let confirmerElt = $("#confirme")
+            $("#btnResetPassword").prop("disabled", true)
+            confirmerElt.on("keyup", function(e){
+                let nouveauPWD = nouveauElt.val()
+                let confirmerPWD = confirmerElt.val()
+                if(nouveauPWD != confirmerPWD){
+                    console.log("Differentes valeurs entrees")
+                    $("#btnResetPassword").prop("disabled", true)
+                }else{
+                    console.log("Valeurs identiques entrees")
+                    $("#btnResetPassword").prop("disabled", false)
+
+                }
+            })
+        })
+    </script>
+{% endblock %}
+

@@ -1,0 +1,103 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    {# --- Formulaire d'ajout --- #}
+    <div class="panel lg:col-span-1">
+        <h2 class="text-lg font-bold mb-4">Nouvelle catégorie</h2>
+
+        {{ form_start(form) }}
+
+        <div class="mb-3">
+            <label class="block mb-1 font-medium">Désignation</label>
+            {{ form_widget(form.designation, {'attr': {'class': 'form-input'}}) }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block mb-1 font-medium">Pourcentage (%)</label>
+            {{ form_widget(form.Pourcentage, {'attr': {'class': 'form-input'}}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full">Enregistrer</button>
+
+        {{ form_end(form) }}
+    </div>
+
+    {# --- Liste des catégories --- #}
+    <div class="panel lg:col-span-2">
+        <div class="flex justify-between items-center mb-4">
+            <h1>Catégories de produits</h1>
+            <div id="export-buttons"></div>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+            <table id="datatable" class="table display w-full">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Désignation</th>
+                        <th>Pourcentage</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% set counter = 0 %}
+                {% for cat in categorie_produits %}
+                    {% set counter = counter + 1 %}
+                    <tr>
+                        <td>{{ counter }}</td>
+                        <td>{{ cat.designation }}</td>
+                        <td>{{ cat.Pourcentage is not null ? cat.Pourcentage ~ ' %' : '—' }}</td>
+                        <td class="flex gap-2 flex-wrap">
+                            <a class="btn btn-sm btn-primary" href="{{ path('app_categorie_produit_edit', {'id': cat.id}) }}">Éditer</a>
+                            <form method="post" action="{{ path('app_categorie_produit_delete', {'id': cat.id}) }}"
+                                  onsubmit="return confirm('Supprimer cette catégorie ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cat.id) }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Aucune catégorie trouvée.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+
+<script>
+    let table = new DataTable('#datatable', {
+        dom: '<"flex justify-between"lf>rtip',
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ entrées)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat',
+            search: 'Rechercher :'
+        },
+        buttons: [
+            { extend: 'excel', text: 'Excel', className: 'btn btn-sm btn-success', filename: 'Categories' },
+            { extend: 'csv',   text: 'CSV',   className: 'btn btn-sm btn-info',    filename: 'Categories' },
+            { extend: 'pdf',   text: 'PDF',   className: 'btn btn-sm btn-danger',  filename: 'Categories', title: 'Catégories de produits' }
+        ]
+    });
+</script>
+
+{% endblock %}

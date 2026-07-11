@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<title>PaieEmploye</title>
+
+{% block body %}
+    <h1>PaieEmploye</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ paie_employe.id }}</td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>{{ paie_employe.total }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_paie_employe_index') }}">back to list</a>
+
+    <a href="{{ path('app_paie_employe_edit', {'id': paie_employe.id}) }}">edit</a>
+
+    {{ include('paie_employe/_delete_form.html.twig') }}
+{% endblock %}

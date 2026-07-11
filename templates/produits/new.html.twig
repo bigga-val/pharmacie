@@ -1,0 +1,80 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+    <div class="panel">
+        <div class="flex justify-between mb-3">
+
+
+        <h1>Enregistrement d'un nouveau produit</h1>
+            <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Voir la liste</a>
+
+        </div>
+        <div>
+            {{ form_start(form) }}
+            {#    {{ form_widget(form) }}#}
+            {#    {{ form_widget(form.nom) }}#}
+            <div>
+                <label for="">Code Produit</label>
+                {{ form_widget(form.code, {'attr': {'class': 'form-input', 'readOnly':'true' }}) }}
+
+
+            </div>
+            <div>
+                <label for="">Designation</label>
+                {{ form_widget(form.designation, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Categorie</label>
+                {{ form_widget(form.Categorie, {'attr': {'class': 'form-input'}}) }}
+
+            </div>
+            <div>
+                <label for="">Unité de Mesure</label>
+                {{ form_widget(form.uniteMesure, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Prix d'achat (FC)</label>
+                {{ form_widget(form.prixAchat, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Prix de vente (FC)</label>
+                {{ form_widget(form.prix, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Quantité Minimale</label>
+
+                {{ form_widget(form.minimum, {'attr': {'class': 'form-input'}}) }}
+            </div>
+            <div>
+                <label for="">Quantité Maximale</label>
+                {{ form_widget(form.maximum, {'attr': {'class': 'form-input'}}) }}
+            </div>
+
+{#            <div>#}
+{#                <label for="">Fabricant</label>#}
+{#                {{ form_widget(form.fabricant, {'attr': {'class': 'form-input', 'required':'false'}}) }}#}
+
+{#            </div>#}
+            <div>
+                <label for="">Préemption</label>
+                {{ form_widget(form.preemption, {'attr': {'class': 'form-input', 'type': 'date', 'required':'false'}}) }}
+            </div>
+            <div>
+                <label for="">Image du produit</label>
+                {{ form_widget(form.imageFile, {'attr': {'class': 'form-input', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG ou WEBP — max 2 Mo</p>
+            </div>
+            <br>
+            <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+    <script src="{{ asset("assets/js/jquery.min.js") }}"></script>
+    <script>
+        $(document).ready(function(e){
+            $("#produits_code").val("{{ code }}")
+        })
+    </script>
+{% endblock %}

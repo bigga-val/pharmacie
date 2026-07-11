@@ -1,0 +1,263 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<script defer src="{{ asset('assets/js/apexcharts.js') }}"></script>
+
+{# ===== HEADER ===== #}
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold">Tableau de bord</h1>
+        <p class="text-sm text-gray-500">{{ moisCourant }}</p>
+    </div>
+    <a href="{{ path('app_audit_log_index') }}" class="btn btn-outline-primary text-sm">
+        Journal d'audit
+    </a>
+</div>
+
+{# ===== KPI CARDS ===== #}
+<div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+
+    <div class="panel bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">CA du mois</div>
+        <div class="text-2xl font-bold">{{ caMois|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">Ventes payées</div>
+    </div>
+
+    <div class="panel bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Ventes du mois</div>
+        <div class="text-2xl font-bold">{{ nbVentes }}</div>
+        <div class="text-xs opacity-70 mt-1">Transactions</div>
+    </div>
+
+
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="panel bg-gradient-to-r from-violet-500 to-violet-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Employés</div>
+        <div class="text-2xl font-bold">{{ nbEmployes }}</div>
+        <div class="text-xs opacity-70 mt-1">
+            <a href="{{ path('app_employe_index') }}" class="underline">Voir les employés</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="panel bg-gradient-to-r from-teal-500 to-teal-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Masse salariale</div>
+        <div class="text-2xl font-bold">{{ masseSalariale|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">Mois courant</div>
+    </div>
+    {% endif %}
+
+    <div class="panel bg-gradient-to-r from-green-500 to-green-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Crédits du mois</div>
+        <div class="text-2xl font-bold">{{ totalCredits|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">
+            <a href="{{ path('app_credit_index') }}" class="underline">Voir les crédits</a>
+        </div>
+    </div>
+
+    <div class="panel bg-gradient-to-r from-red-500 to-red-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Débits du mois</div>
+        <div class="text-2xl font-bold">{{ totalDebits|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">
+            <a href="{{ path('app_debit_index') }}" class="underline">Voir les débits</a>
+        </div>
+    </div>
+
+    <div class="panel bg-gradient-to-r from-cyan-500 to-cyan-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Solde net</div>
+        <div class="text-2xl font-bold">{{ (totalCredits - totalDebits)|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">Crédits − Débits</div>
+    </div>
+
+    <div class="panel bg-gradient-to-r from-amber-500 to-amber-600 text-white">
+        <div class="text-xs font-semibold uppercase opacity-80 mb-1">CA d'hier</div>
+        <div class="text-2xl font-bold">{{ caHier|number_format(0, ',', ' ') }}</div>
+        <div class="text-xs opacity-70 mt-1">{{ nbVentesHier }} vente(s)</div>
+    </div>
+
+</div>
+
+{# ===== GRAPHIQUES ===== #}
+<div class="grid xl:grid-cols-3 gap-4 mb-6">
+
+    {# CA 6 derniers mois #}
+    <div class="panel xl:col-span-2">
+        <h5 class="font-semibold text-lg mb-4">CA — 6 derniers mois</h5>
+        <div id="chartCA"></div>
+    </div>
+
+    {# Top 5 produits #}
+    <div class="panel">
+        <h5 class="font-semibold text-lg mb-3">Top 5 produits vendus</h5>
+        <form method="GET" action="{{ path('app_dashboard') }}" class="flex flex-wrap gap-2 mb-4 items-end">
+            <div>
+                <label class="text-xs text-gray-500 block mb-1">Du</label>
+                <input type="date" name="date1" value="{{ topDate1 ?? '' }}" class="form-input text-sm py-1">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500 block mb-1">Au</label>
+                <input type="date" name="date2" value="{{ topDate2 ?? '' }}" class="form-input text-sm py-1">
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filtrer</button>
+            {% if topDate1 or topDate2 %}
+                <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary btn-sm">Réinitialiser</a>
+            {% endif %}
+        </form>
+        {% if topProduits %}
+            <div class="space-y-3">
+            {% for prod in topProduits %}
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="truncate font-medium max-w-[160px]">{{ prod.designation }}</span>
+                        <span class="text-gray-500 ml-2">{{ prod.chiffre|number_format(0, ',', ' ') }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full"
+                             style="width: {{ topProduits[0].chiffre > 0 ? (prod.chiffre / topProduits[0].chiffre * 100)|round : 0 }}%">
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-400 text-sm">Aucune donnée</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{# Ventes par jour du mois #}
+<div class="panel mb-6">
+    <h5 class="font-semibold text-lg mb-4">Ventes par jour — mois courant</h5>
+    <div id="chartJours"></div>
+</div>
+
+{# ===== TABLEAUX RECENTS ===== #}
+<div class="grid xl:grid-cols-2 gap-4 mb-6">
+
+    {# Dernières ventes #}
+    <div class="panel">
+        <div class="flex justify-between items-center mb-3">
+            <h5 class="font-semibold">Dernières ventes</h5>
+            <a href="{{ path('app_vente_index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+        </div>
+        <table class="table text-sm">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Par</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for v in dernieresVentes %}
+                <tr>
+                    <td>{{ v.numeroVente ?? '#'~v.id }}</td>
+                    <td>{{ v.venteDate ? v.venteDate|date('d/m/Y') : '—' }}</td>
+                    <td>
+                        {% if v.statusVente == 'paid' %}
+                            <span class="badge bg-success">Payée</span>
+                        {% elseif v.statusVente == 'pending' %}
+                            <span class="badge bg-warning">En attente</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ v.statusVente ?? '—' }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ v.createdBy ?? '—' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" class="text-center text-gray-400">Aucune vente</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+{# ===== ACTIVITE RECENTE (AUDIT) ===== #}
+<div class="panel">
+    <div class="flex justify-between items-center mb-3">
+        <h5 class="font-semibold">Activité récente</h5>
+        <a href="{{ path('app_audit_log_index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+    </div>
+    <table class="table text-sm">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Utilisateur</th>
+                <th>Entité</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log in derniersLogs %}
+            <tr>
+                <td class="whitespace-nowrap">{{ log.createdAt|date('d/m/Y H:i') }}</td>
+                <td>{{ log.userEmail ?? '—' }}</td>
+                <td><span class="badge bg-info">{{ log.entityName }}</span></td>
+                <td>
+                    {% if log.action == 'CREATE' %}
+                        <span class="badge bg-success">CREATE</span>
+                    {% elseif log.action == 'UPDATE' %}
+                        <span class="badge bg-warning">UPDATE</span>
+                    {% else %}
+                        <span class="badge bg-danger">DELETE</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4" class="text-center text-gray-400">Aucune activité enregistrée</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# ===== APEXCHARTS ===== #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Graphique CA 6 derniers mois
+    const caLabels = {{ caLabels|raw }};
+    const caData   = {{ caData|raw }};
+
+    if (caLabels.length > 0) {
+        new ApexCharts(document.querySelector('#chartCA'), {
+            chart: { type: 'area', height: 250, toolbar: { show: false } },
+            series: [{ name: 'CA', data: caData }],
+            xaxis: { categories: caLabels },
+            colors: ['#4361ee'],
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
+            stroke: { curve: 'smooth', width: 2 },
+            dataLabels: { enabled: false },
+            tooltip: { y: { formatter: v => v.toLocaleString('fr-FR') + ' ' } },
+            grid: { borderColor: '#e0e6ed' },
+        }).render();
+    } else {
+        document.querySelector('#chartCA').innerHTML = '<p class="text-center text-gray-400 py-10">Aucune donnée</p>';
+    }
+
+    // Graphique ventes par jour
+    const joursLabels = {{ joursLabels|raw }};
+    const joursData   = {{ joursData|raw }};
+
+    if (joursLabels.length > 0) {
+        new ApexCharts(document.querySelector('#chartJours'), {
+            chart: { type: 'bar', height: 200, toolbar: { show: false } },
+            series: [{ name: 'Ventes', data: joursData }],
+            xaxis: { categories: joursLabels, title: { text: 'Jour du mois' } },
+            colors: ['#00ab55'],
+            dataLabels: { enabled: false },
+            plotOptions: { bar: { borderRadius: 4 } },
+            tooltip: { y: { formatter: v => v.toLocaleString('fr-FR') + ' ' } },
+            grid: { borderColor: '#e0e6ed' },
+        }).render();
+    } else {
+        document.querySelector('#chartJours').innerHTML = '<p class="text-center text-gray-400 py-6">Aucune donnée pour ce mois</p>';
+    }
+
+});
+</script>
+
+{% endblock %}

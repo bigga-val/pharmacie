@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<title>Employe</title>
+
+{% block body %}
+    <h1>Employe</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ employe.id }}</td>
+            </tr>
+            <tr>
+                <th>Nomcomplet</th>
+                <td>{{ employe.nomcomplet }}</td>
+            </tr>
+            <tr>
+                <th>Matricule</th>
+                <td>{{ employe.matricule }}</td>
+            </tr>
+            <tr>
+                <th>Dateembauche</th>
+                <td>{{ employe.dateembauche ? employe.dateembauche|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Categorie</th>
+                <td>{{ employe.categorie }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_employe_index') }}">back to list</a>
+
+    <a href="{{ path('app_employe_edit', {'id': employe.id}) }}">edit</a>
+
+    {{ include('employe/_delete_form.html.twig') }}
+{% endblock %}

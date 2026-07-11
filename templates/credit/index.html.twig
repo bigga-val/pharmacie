@@ -1,0 +1,77 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Sortie de Caisse</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_credit_new') }}">Nouvelle sortie</a>
+
+    </div>
+    <div>
+        <input type="text" class="form-input mb-3" id="myInput" placeholder="Rechercher..." title="Tapez ici pour rechercher">
+
+        <table id="datatable" class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Montant(Fc)</th>
+                <th>Montant($)</th>
+                <th>Taux</th>
+                <th>Cree Par</th>
+                <th>Raison</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
+            {% for credit in credits %}
+                {% set counter = counter + 1 %}
+
+                <tr>
+                    <td>{{ counter }}</td>
+{#                    <td>{{ credit.dateCredit ? credit.dateCredit|date('Y-m-d') : '' }}</td>#}
+                    <td>{{ credit.createdAt ? credit.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ credit.montant }}</td>
+                    {% set convert = 0 %}
+                    {% if credit.taux is not null or credit.taux != 0 %}
+                        {% set convert = credit.montant / credit.taux %}
+                    {% endif %}
+                    <td>{{ convert|number_format(2) }}</td>
+                    <td>{{ credit.taux }}</td>
+                    <td>{{ credit.createdBy }}</td>
+                    <td>{{ credit.raison }}</td>
+                    <td>
+                        <a href="{{ path('app_credit_show', {'id': credit.id}) }}">show</a>
+                        <a href="{{ path('app_credit_edit', {'id': credit.id}) }}">edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+    <script>
+        let table = new DataTable('#datatable', {
+            order: [[0, 'desc']],
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ ligne par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+    </script>
+{% endblock %}
+

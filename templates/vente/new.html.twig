@@ -1,0 +1,511 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Vendre des produits</h1>
+
+        <h3>Taux: 1$ = {{ (app.session.get('tauxactif')) }} Fc</h3>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_produits_index') }}">Liste des produits</a>
+    </div>
+    <hr>
+    <div>
+        <table class="table">
+            <tr>
+                <td>Facture No: <span>{{ numeroFacture }}</span></td>
+                <td >
+
+                </td>
+                <td>Date: <span id="date"></span></td>
+
+            </tr>
+        </table>
+        <table>
+            <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Qté</th>
+                <th>Qté Dispo</th>
+                <th>Prix Unitaire</th>
+                <th>Mesure</th>
+                <th>Sous-Total</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody class="tbody">
+            </tbody>
+        </table>
+        <div class="sm:mb-0 mb-6 p-2">
+            <button id="add-row" class="btn btn-primary">Ajouter</button>
+        </div>
+        <hr>
+        <br>
+        <div class="sm:w-2/5 ">
+            <div class="">
+                <div></div>
+                <div class="border p-2 border-4 rounded">Total: <span id="subtotal">0</span></div>
+            </div>
+{#            <div class="flex items-end justify-between mt-4">#}
+{#                <div>TVA(%)</div>#}
+{#                <div><input class="form-input" type="number" id="tax-input" value="16"   ></div>#}
+{#            </div>#}
+        </div>
+        <br>
+        <span id="errorSpan" class="text-danger"></span>
+
+        <div class="flex">
+            <button id="btnSaveInvoice" class="btn btn-success">
+                Enregistrer Sans Payer
+            </button>
+
+            <button id="btnSaveInvoice2" class="btn btn-success  mx-3">
+                Enregistrer et payer
+            </button>
+
+            <button id="btnSaveInvoicePrint" class="btn btn-success  mx-3">
+                Vendre et Facturer
+            </button>
+        </div>
+
+
+    </div>
+</div>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        const date = new Date();
+        const element = document.getElementById("date");
+        element.textContent = date.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    </script>
+<script>
+    $(document).ready(function() {
+        $("#btnSaveInvoice").prop("disabled", true)
+        $("#btnSaveInvoice2").prop("disabled", true)
+        $("#btnSaveInvoicePrint").prop("disabled", true)
+
+        // Ajouter une ligne
+        let counter = 0
+        var newRow = '<tr class="prod_Line">'+
+            '<td><select class="form-input item-product" name="select-'+counter+'">' +
+            '<option value="-1">Choisir un produit</option>'+
+                {% for produit in produits %}
+            '<option value="{{ produit.produitID }}">{{ produit.designation }}</option>'+
+                {% endfor %}
+            '</select></td>'+
+            '   <td><input type="number" class="form-input item-quantity" ></td>'+
+            '   <td><span class="item-dispo"></span></td>'+
+
+            '   <td><input type="number" class="form-input item-prix" readonly="true">' +
+            '   <td>' +
+                '<span class="item-unit">-</span>' +
+                '<span class="item-min hidden d-none"></span>' +
+                '<span class="item-max hidden d-none"></span>' +
+                '</td>'+
+            '   <td><span class="item-total">0</span></td>'+
+            '   <td><button class="remove-row btn btn-danger btn-sm">X</button></td>'+
+            '</tr>'
+        let row = $('.tbody').append(newRow);
+        initNiceSelect(row[0]);
+        //console.log(newRow)
+        $('#add-row').click(function() {
+            counter++
+            let row = $('.tbody').append(newRow);
+            initNiceSelect(row[0]);
+            setPrix()
+        });
+
+        // Supprimer une ligne
+        $('table').on('click', '.remove-row', function() {
+            counter--
+            $(this).closest('tr').remove();
+            //setting the subtotal and total when removed an invoice line
+            let subtotal = 0
+            $('.item-total').each(function(i, e){
+                subtotal = subtotal+ parseFloat($(this).text())
+            })
+            $('#subtotal').text(subtotal)
+            setTotal()
+        });
+            setPrix()
+    });
+
+    //saving the invoice without pay
+    $("#btnSaveInvoice").click(function(e) {
+        $("a, button, span, input").attr("disabled", true)
+
+        console.log("clicled")
+
+        $(".tbody").find("tr").each(function(e, i){
+            console.log($(this).find("td").eq(0).find(".item-product").val())
+            console.log($(this).find("td").eq(1).find(".item-quantity").val())
+            console.log($(this).find("td").eq(2).find(".item-prix").val())
+        })
+        let client = $("#reciever-name").val()
+        let invType = $("#inv-type").val()
+        let numberFacture = $("#number")
+        let designation = $("#invoiceLabel").val()
+        let startDate = $("#startDate").val()
+        let endDate = $("#dueDate").val()
+        //console.log('debut')
+        $.ajax({
+            url: '/vente/jsonSaveVente',
+            method: 'GET',
+            data: {},
+            success: function (response) {
+                console.log(response)
+                if(response.etat){
+
+                    $(".tbody").find("tr").each(function(e, i){
+                        let venteID = response.venteID
+                        let productID = $(this).find("td").eq(0).find(".item-product").val()
+                        let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                        // let price = $(this).find("td").eq(2).find(".item-prix").val()
+
+                        if(productID != -1){
+                            // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                            $.ajax({
+                                url: '/produit/vendu/jsonSaveLigneVente?' +
+                                    'venteID=' +venteID+
+                                    '&produitID='+ productID+
+                                    '&qty='+ quantity,
+                                method: 'GET',
+                                data: {
+                                },
+                                success: function (response) {
+                                    //console.log("bien ajoute")
+                                   // console.log(response)
+                                    raiseToastr('success', 'Vente éffectuée avec succès !')
+                                    //-- On reload l'app apres l'enregistrement des produits vendu
+                                    window.location.href = "/vente/new";
+                                },
+                                error: function (e) {
+                                    console.log('Erreur lors de la requête AJAX.');
+                                    console.log(e)
+                                    // Autres actions à effectuer en cas d'erreur
+                                }
+                            })
+                         }
+                    })
+                }
+            },
+            error: function () {
+                alert('Erreur lors de la requête AJAX.');
+                // Autres actions à effectuer en cas d'erreur
+            }
+        })
+        console.log('fin')
+    })
+
+
+    //saving the invoice and confirm invoice payment
+    $("#btnSaveInvoice2").click(function(e) {
+        $("a, button, span, input").attr("disabled", true)
+
+        //console.log("clicled")
+
+        $(".tbody").find("tr").each(function(e, i){
+            console.log($(this).find("td").eq(0).find(".item-product").val())
+            console.log($(this).find("td").eq(1).find(".item-quantity").val())
+            console.log($(this).find("td").eq(2).find(".item-prix").val())
+        })
+        let client = $("#reciever-name").val()
+        let invType = $("#inv-type").val()
+        let numberFacture = $("#number")
+        let designation = $("#invoiceLabel").val()
+        let startDate = $("#startDate").val()
+        let endDate = $("#dueDate").val()
+        //console.log('debut')
+        $.ajax({
+            url: '/vente/jsonSaveVentePay',
+            method: 'GET',
+            data: {
+            },
+            success: function (response) {
+                console.log(response)
+                if(response.etat){
+                    $(".tbody").find("tr").each(function(e, i){
+                        let venteID = response.venteID
+                        let productID = $(this).find("td").eq(0).find(".item-product").val()
+                        let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                        // let price = $(this).find("td").eq(2).find(".item-prix").val()
+                        if(productID != -1){
+                            // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                            $.ajax({
+                                url: '/produit/vendu/jsonSaveLigneVente?' +
+                                    'venteID=' +venteID+
+                                    '&produitID='+ productID+
+                                    '&qty='+ quantity,
+                                method: 'GET',
+                                data: {
+                                },
+                                success: function (response) {
+                                    //console.log("bien ajoute")
+                                    // console.log(response)
+                                    //-- On reload l'app apres l'enregistrement des produits vendu
+                                    raiseToastr('success', 'Vente éffectuée avec succès !')
+                                    window.location.href = "/vente/"+venteID;
+                                },
+                                error: function (e) {
+                                    raiseToastr('error', 'Une erreur est survenue lors de la vente !')
+
+                                    console.log('Erreur lors de la requête AJAX.');
+                                    console.log(e)
+                                    // Autres actions à effectuer en cas d'erreur
+                                }
+                            })
+                        }
+                    })
+                }
+            },
+            error: function () {
+                raiseToastr('error', 'Erreur inconnue survenue !')
+
+                alert('Erreur lors de la requête AJAX.');
+                // Autres actions à effectuer en cas d'erreur
+            }
+        })
+        //console.log('fin')
+    })
+
+    //saving the invoice and confirm invoice payment
+    $("#btnSaveInvoicePrint").click(function(e) {
+        $("a, button, span, input").attr("disabled", true)
+
+        //console.log("clicled")
+
+        $(".tbody").find("tr").each(function(e, i){
+            console.log($(this).find("td").eq(0).find(".item-product").val())
+            console.log($(this).find("td").eq(1).find(".item-quantity").val())
+            console.log($(this).find("td").eq(2).find(".item-prix").val())
+        })
+        let client = $("#reciever-name").val()
+        let invType = $("#inv-type").val()
+        let numberFacture = $("#number")
+        let designation = $("#invoiceLabel").val()
+        let startDate = $("#startDate").val()
+        let endDate = $("#dueDate").val()
+        //console.log('debut')
+        $.ajax({
+            url: '/vente/jsonSaveVentePay',
+            method: 'GET',
+            data: {
+            },
+            success: function (response) {
+                // console.log(response)
+                if(response.etat){
+                    $(".tbody").find("tr").each(function(e, i){
+                        let venteID = response.venteID
+                        let productID = $(this).find("td").eq(0).find(".item-product").val()
+                        let quantity = $(this).find("td").eq(1).find(".item-quantity").val()
+                        // let price = $(this).find("td").eq(2).find(".item-prix").val()
+                        if(productID != -1){
+                            // console.log("produit:"+productID+"-quantite:"+quantity+"-prix:"+price)
+                            $.ajax({
+                                url: '/produit/vendu/jsonSaveLigneVente?' +
+                                    'venteID=' +venteID+
+                                    '&produitID='+ productID+
+                                    '&qty='+ quantity,
+                                method: 'GET',
+                                data: {
+                                },
+                                success: function (response) {
+                                    //console.log("bien ajoute")
+                                    // console.log(response)
+                                    //let redir2 = '<?php echo url("app_generate_pdf", {"id": ' + venteID + '}) ?>';
+                                    //-- On reload l'app apres l'enregistrement des produits vendu
+                                    //window.location.href = "/vente/generatePdf/"+venteID+"";
+                                    window.open("/vente/generatePdf/"+venteID+"", '_blank');
+                                    raiseToastr('success', 'Vente éffectuée avec succès !')
+                                    window.location.reload();
+
+                                    //window.location.href = "/vente/generatePdf/"+venteID+"";
+                                },
+                                error: function (e) {
+                                    console.log('Erreur lors de la requête AJAX.');
+                                    console.log(e)
+                                    // Autres actions à effectuer en cas d'erreur
+                                }
+                            })
+                        }
+                    })
+                }
+            },
+            error: function () {
+                raiseToastr('error', 'Une erreur est survenue !')
+
+                //alert('Erreur lors de la requête AJAX.');
+                // Autres actions à effectuer en cas d'erreur
+            }
+        })
+        //console.log('fin')
+    })
+
+
+    function initNiceSelect(context = document) {
+        context.querySelectorAll('select').forEach(function (el) {
+            if (!el.classList.contains('nice-initialized')) {
+                NiceSelect.bind(el, {
+                    searchable: true,
+                    placeholder: "Rechercher ...",
+                    searchPlaceholder: "Rechercher ..."
+                });
+                el.classList.add('nice-initialized');
+            }
+        });
+    }
+
+    //Automatizing the calculations on fields for creation
+    function setPrix(){
+        let selectElement = $('select[name^="select-"]');
+        $(".item-product").each(function(i, e){
+            $(this).on("change", function(e){
+                console.log($(this).val())
+                if($(this).val() != -1){
+
+                    let qty = $(this).parent("td").siblings("td").children(".item-quantity")
+
+                    let amount = $(this).parent("td").siblings("td").children(".item-prix")
+                    let totalAmount = $(this).parent("td").siblings("td").children(".item-total")
+                    let unit = $(this).parent("td").siblings("td").children(".item-unit")
+                    let min = $(this).parent("td").siblings("td").children(".item-min")
+                    let max = $(this).parent("td").siblings("td").children(".item-max")
+                    let reserve = $(this).parent("td").siblings("td").children(".item-reserve")
+                    let dispo = $(this).parent("td").siblings("td").children(".item-dispo")
+                    let reel = 0
+                    $.ajax({
+                        url: '/vente/jsonGetProduct2?',// +
+                            //'productID=' + $(this).val(),
+                        method: 'GET',
+                        data: {
+                            productID: $(this).val(),
+                        },
+                        success: function (response) {
+                            console.log(response)
+                            var ts = response["data"][0]["totalSortie"] != null?response["data"][0]["totalSortie"]:0
+                            var tr = response["data"][0]["totalReserve"] != null?response["data"][0]["totalReserve"]:0
+                            var te = response["data"][0]["totalEntree"] != null? response["data"][0]["totalEntree"]:0
+
+                            reel = te-(tr+ts)
+                            if(isNaN(reel)){
+                                reel = 0
+                            }else{
+
+                            }
+                            console.log(te, ts, tr, reel)
+                            console.log(response["data"][0]["prix"])
+                            amount.val(response["data"][0]["prix"])
+                            unit.text(response["data"][0]["uniteMesure"])
+                            min.text(response["data"][0]["minimum"])
+                            max.text(response["data"][0]["maximum"])
+                            dispo.text(reel)
+                            // qty.attr('readonly', false)
+                            // qty.val(1)
+                            // totalAmount.text(response["prix"])
+                             // --- Set the subtotal value --- \\
+                             let subtotal = 0
+                            $('.item-total').each(function(i, e){
+                                subtotal = subtotal+ parseFloat($(this).text())
+                            })
+
+                            $('#subtotal').text(subtotal)
+                            setTotal()
+                        },
+                        error: function (xhr, status, error) {
+                            // Message renvoyé par le serveur
+                            let message = xhr.responseText;
+
+                            // Affichage simple
+                            console.log(error);
+
+                            // Ou dans une div
+                            //$('#error-message').text(message).show();
+                        }
+                        //let qty = $(this).parent("td").siblings("td").children("input[x-model='item.quantity']")
+                    })
+
+                    qty.on("keyup", function(e){
+                        let qtyVal = parseFloat($(this).val())
+                        let dispoVal = parseFloat(dispo.text())
+                        if(isNaN(qtyVal) || qtyVal <= 0) {
+                            $("#btnSaveInvoice").prop("disabled", true)
+                            $("#btnSaveInvoice2").prop("disabled", true)
+                            $("#btnSaveInvoicePrint").prop("disabled", true)
+                            $("#errorSpan").text("Quantité invalide")
+                        }else if(qtyVal > dispoVal) {
+                            $("#btnSaveInvoice").prop("disabled", true)
+                            $("#btnSaveInvoice2").prop("disabled", true)
+                            $("#btnSaveInvoicePrint").prop("disabled", true)
+                            $("#errorSpan").text("Stock insuffisant — disponible : " + dispoVal)
+                        }else{
+                            $("#btnSaveInvoice").prop("disabled", false)
+                            $("#btnSaveInvoice2").prop("disabled", false)
+                            $("#btnSaveInvoicePrint").prop("disabled", false)
+                            $("#errorSpan").text("")
+
+                            let total = parseFloat(amount.val()) * qtyVal
+                            totalAmount.text(total)
+                            let subtotal = 0
+                            $('.item-total').each(function(i, e){
+                                subtotal = subtotal + parseFloat($(this).text())
+                            })
+                            $('#subtotal').text(subtotal)
+                            setTotal()
+                        }
+                    })
+
+                }
+            })
+        })
+
+    }
+
+
+
+    function setTotal(){
+        let subtotal = parseFloat($('#subtotal').text()) || 0
+        $('#subtotal').text(subtotal)
+    }
+</script>
+{#    Making select input searchable#}
+    <script>
+        document.addEventListener("DOMContentLoaded", function(e) {
+            // seachable
+            var options = {
+                searchable: true,
+                placeholder:"Choisir la table"
+            };
+            // NiceSelect.bind(document.getElementById("input-tables"), options);
+
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            initNiceSelect();
+            // document.querySelectorAll('select').forEach(function (el) {
+            //     NiceSelect.bind(el, {
+            //         searchable: true
+            //     });
+            // });
+        });
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            console.log('jquery', $.fn.jquery);
+            //console.log('nice-select2', $.fn.nice-select2);
+            //console.log('Select2:', typeof $.fn.select2);
+
+            // $('.item-product').select2({
+            //     placeholder: 'Rechercher...',
+            //     width: '100%'
+            // });
+        });
+
+    </script>
+{% endblock %}

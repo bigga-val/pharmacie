@@ -1,0 +1,140 @@
+{% extends 'components/layout/default.html.twig' %}
+
+
+{% block content %}
+
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Taux Recents</h1>
+        <div class="mb-5" x-data="modal">
+            <div class="flex items-center justify-center">
+                <button type="button" class="btn btn-info" @click="toggle">Changer le Taux</button>
+            </div>
+            <div class="fixed inset-0 bg-[black]/60 z-[999] hidden overflow-y-auto"
+                 :class="open && '!block'">
+                <div class="flex items-center justify-center min-h-screen px-4"
+                     @click.self="open = false">
+                    <div x-show="open" x-transition x-transition.duration.300
+                         class="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8">
+                        <div
+                                class="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                            <h5 class="font-bold text-lg">Définir le taux</h5>
+                            <button type="button" class="text-white-dark hover:text-dark"
+                                    @click="toggle">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                     class="w-6 h-6">
+                                    <line x1="18" y1="6" x2="6" y2="18">
+                                    </line>
+                                    <line x1="6" y1="6" x2="18" y2="18">
+                                    </line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
+                                <form method="POST" action="{{ path("app_taux_new_changed") }}">
+                                    <div class="p-5">
+                                        <div class="dark:text-white-dark/70 text-base font-medium text-[#1f2937]">
+                                            <label for="taux">Entrez Le Taux</label>
+                                            <input typeof="number" class="form-input" name="taux" id="taux" required>
+
+                                        </div>
+                                        <div class="flex justify-end items-center mt-8">
+                                            <button type="button" class="btn btn-outline-danger" @click="toggle">Annuler</button>
+                                            <button type="submit" class="btn btn-primary ltr:ml-4 rtl:mr-4" @click="toggle">Enregistrer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+{#                            <div class="flex justify-end items-center mt-8">#}
+{#                                <button type="button" class="btn btn-outline-danger"#}
+{#                                        @click="toggle">Discard</button>#}
+{#                                <button type="button" class="btn btn-primary ltr:ml-4 rtl:mr-4"#}
+{#                                        @click="toggle">Save</button>#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div>
+
+        <table id="datatable" class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Cout</th>
+                <th>CreatedAt</th>
+                <th>Status</th>
+                <th>Par</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% set counter = 0 %}
+            {% for taux in tauxes %}
+                {% set counter = counter + 1 %}
+                <tr>
+                    <td>{{ counter }}</td>
+                    <td>{{ taux.cout }}</td>
+                    <td>{{ taux.createdAt ? taux.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                    <td>{{ taux.isActive ? 'Actif' : 'Inactif' }}</td>
+                    <td>
+                        {{ taux.user.username }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="">no records found</td>
+                    <td colspan="">no records found</td>
+                    <td colspan="">no records found</td>
+                    <td colspan="">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+    <!-- Vertically Centered -->
+
+        </div>
+
+
+
+
+
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables.js') }}"></script>
+
+
+    <script>
+
+        let table = new DataTable('#datatable', {
+            order: [[0, 'desc']],
+            language: {
+                info: 'Page _PAGE_ / _PAGES_',
+                infoEmpty: 'No records available',
+                infoFiltered: '(filtered from _MAX_ total records)',
+                lengthMenu: 'Afficher _MENU_ ligne par page',
+                zeroRecords: 'Nothing found - sorry'
+            },
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        });
+        $(document).ready(function(e){
+            $("#taux").on("keyup", function(e){
+                if(isNaN($(this).val())){
+                    return false
+                }
+            })
+        })
+    </script>
+
+{% endblock %}

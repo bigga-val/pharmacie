@@ -1,0 +1,167 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Bon de commande</h1>
+        <p class="text-sm text-gray-500 mt-1">Produits pré-sélectionnés selon les stocks bas. Retirez ceux dont vous n'avez pas besoin.</p>
+    </div>
+</div>
+
+{% for type, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ type == 'error' ? 'danger' : type }} mb-4">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+{% if stockBas is empty %}
+    <div class="panel text-center py-16">
+        <svg class="mx-auto mb-4 text-success" width="56" height="56" viewBox="0 0 24 24" fill="none">
+            <path opacity="0.3" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="currentColor"/>
+            <path d="M7 12.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-700 dark:text-white">Tous les stocks sont suffisants !</h3>
+        <p class="text-gray-400 mt-2">Aucun produit ne nécessite d'approvisionnement pour le moment.</p>
+        <a href="{{ path('app_approvisionnement_stock') }}" class="btn btn-outline-primary mt-6">Voir le stock</a>
+    </div>
+{% else %}
+
+<form method="POST" action="{{ path('app_commande_appro') }}" id="commandeForm">
+
+    {# Bloc email #}
+    <div class="panel mb-5">
+        <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+            <div class="flex-1">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-white mb-1">
+                    Destinataire (email)
+                </label>
+                <input type="email" name="email" value="{{ adminEmail }}" required
+                    class="form-input w-full"
+                    placeholder="exemple@domaine.com"/>
+                <p class="text-xs text-gray-400 mt-1">Le bon de commande sera envoyé à cette adresse.</p>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau des produits #}
+    <div class="panel">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-semibold text-gray-700 dark:text-white">
+                Produits à commander
+                <span id="countBadge" class="badge bg-danger ltr:ml-2">{{ stockBas|length }}</span>
+            </h2>
+            <span class="text-xs text-gray-400">Cliquez sur <span class="text-danger font-semibold">✕</span> pour retirer un produit.</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-hover" id="commandeTable">
+                <thead>
+                    <tr>
+                        <th class="text-center w-10">#</th>
+                        <th>Désignation</th>
+                        <th class="text-center">Stock dispo</th>
+                        <th class="text-center">Stock min.</th>
+                        <th class="text-center w-40">Qté à commander</th>
+                        <th class="text-center w-12"></th>
+                    </tr>
+                </thead>
+                <tbody id="commandeBody">
+                    {% for i, prod in stockBas %}
+                    <tr class="produit-row" data-index="{{ i }}">
+                        <td class="text-center text-gray-400 row-num">{{ i + 1 }}</td>
+                        <td>
+                            <input type="hidden" name="designation[]" value="{{ prod.designation }}"/>
+                            <span class="font-medium text-gray-800 dark:text-white">{{ prod.designation }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge {{ prod.stockDisponible <= 0 ? 'bg-danger' : 'bg-warning' }}">
+                                {{ prod.stockDisponible|number_format(0, ',', ' ') }}
+                            </span>
+                        </td>
+                        <td class="text-center text-gray-500">{{ prod.minimum is not null ? prod.minimum|number_format(0, ',', ' ') : '-' }}</td>
+                        <td class="text-center">
+                            <input type="number"
+                                name="quantite[]"
+                                min="1"
+                                step="1"
+                                value="{{ prod.minimum is not null and prod.stockDisponible < prod.minimum
+                                    ? (prod.minimum - prod.stockDisponible)|round(0, 'ceil')
+                                    : prod.minimum ?? 1 }}"
+                                class="form-input text-center w-28 mx-auto"
+                                required/>
+                        </td>
+                        <td class="text-center">
+                            <button type="button"
+                                class="btn-remove w-7 h-7 rounded-full flex items-center justify-center text-danger hover:bg-danger/10 transition mx-auto"
+                                title="Retirer ce produit">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M6 18L18 6M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="emptyMsg" class="hidden text-center py-10 text-gray-400">
+            <p>Tous les produits ont été retirés. Rechargez la page pour recommencer.</p>
+        </div>
+    </div>
+
+    {# Actions #}
+    <div class="flex flex-col sm:flex-row gap-3 mt-6 justify-end">
+        <button type="submit" name="action" value="pdf"
+            class="btn btn-outline-primary gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path opacity="0.5" d="M3 10C3 6.229 3 4.343 4.172 3.172C5.343 2 7.229 2 11 2H13C16.771 2 18.657 2 19.828 3.172C21 4.343 21 6.229 21 10V14C21 17.771 21 19.657 19.828 20.828C18.657 22 16.771 22 13 22H11C7.229 22 5.343 22 4.172 20.828C3 19.657 3 17.771 3 14V10Z" fill="currentColor"/>
+                <path d="M8 12H16M8 8H16M8 16H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Télécharger PDF
+        </button>
+        <button type="submit" name="action" value="email"
+            class="btn btn-primary gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path opacity="0.5" d="M2 7C2 5.343 3.343 4 5 4H19C20.657 4 22 5.343 22 7V17C22 18.657 20.657 20 19 20H5C3.343 20 2 18.657 2 17V7Z" fill="currentColor"/>
+                <path d="M2 8L10.837 13.223C11.537 13.65 12.463 13.65 13.163 13.223L22 8" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Envoyer par email
+        </button>
+    </div>
+
+</form>
+{% endif %}
+
+<script>
+    (function () {
+        const body  = document.getElementById('commandeBody');
+        const empty = document.getElementById('emptyMsg');
+        const badge = document.getElementById('countBadge');
+
+        function recount() {
+            const rows = body.querySelectorAll('.produit-row');
+            const count = rows.length;
+            badge.textContent = count;
+            // re-numéroter
+            rows.forEach((row, i) => {
+                const num = row.querySelector('.row-num');
+                if (num) num.textContent = i + 1;
+            });
+            if (count === 0) {
+                empty.classList.remove('hidden');
+                document.querySelector('[name="action"][value="pdf"]')?.setAttribute('disabled', true);
+                document.querySelector('[name="action"][value="email"]')?.setAttribute('disabled', true);
+            }
+        }
+
+        body.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-remove');
+            if (!btn) return;
+            btn.closest('.produit-row').remove();
+            recount();
+        });
+    })();
+</script>
+
+{% endblock %}

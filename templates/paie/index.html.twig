@@ -1,0 +1,67 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+<div class="panel">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Périodes de paie</h2>
+            <p class="text-sm text-gray-400">Gérez les périodes pour le calcul des salaires</p>
+        </div>
+        <a href="{{ path('app_paie_new') }}" class="btn btn-primary gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Nouvelle période
+        </a>
+    </div>
+</div>
+
+<div class="panel mt-4">
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Libellé</th>
+                    <th>Mois</th>
+                    <th>Année</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for paie in paies %}
+                <tr>
+                    <td>
+                        <span class="font-medium text-gray-800 dark:text-white">{{ paie.label }}</span>
+                    </td>
+                    <td>
+                        {% set mois = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'] %}
+                        <span class="badge bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full font-medium">
+                            {{ mois[paie.MonthPay] ?? paie.MonthPay }}
+                        </span>
+                    </td>
+                    <td class="text-gray-500">{{ paie.YearPay }}</td>
+                    <td>
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="{{ path('app_paie_edit', {'id': paie.id}) }}"
+                               class="btn btn-sm btn-outline-primary">Modifier</a>
+                            <form method="post" action="{{ path('app_paie_delete', {'id': paie.id}) }}"
+                                  onsubmit="return confirm('Supprimer cette période ?');" class="inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ paie.id) }}">
+                                <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-10 text-gray-400">
+                        <svg class="mx-auto mb-2 w-10 h-10 opacity-30" viewBox="0 0 24 24" fill="none">
+                            <path d="M8 2v3M16 2v3M3 9h18M4 4h16a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        Aucune période de paie définie
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

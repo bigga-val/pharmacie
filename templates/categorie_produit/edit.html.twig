@@ -1,0 +1,16 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <div class="panel">
+        <div class="flex justify-between">
+            <h1>Editer une categorie de produit</h1>
+            <a class="btn btn-primary" href="{{ path('app_categorie_produit_index') }}">Voir la liste</a>
+        </div>
+        <hr>
+
+        {{ include('categorie_produit/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{{ form_start(form) }}
+{#    {{ form_widget(form) }}#}
+    <div>
+        <label for="">Label</label>
+        {{ form_widget(form.label, {'attr': {'class': 'form-input'}}) }}
+    </div>
+    <div>
+        <label for="">Mois</label>
+        {{ form_widget(form.MonthPay, {'attr': {'class': 'form-input'}}) }}
+    </div>
+<div>
+    <label for="">Annee</label>
+    {{ form_widget(form.YearPay, {'attr': {'class': 'form-input'}}) }}
+</div>
+<br>
+    <button class="btn btn-success">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

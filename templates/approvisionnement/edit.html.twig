@@ -1,0 +1,70 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Editer Approvisionnement</h1>
+        <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_approvisionnement_new') }}">Nouvel Approvisionnement</a>
+
+    </div>
+
+{#    {{ include('approvisionnement/_form.html.twig', {'button_label': 'Update'}) }}#}
+
+    <div>
+        <div>
+            {{ form_start(form) }}
+
+            <label for="">Produit</label>
+            {{ form_widget(form.produit, {'attr': {'class': 'form-input'}}) }}
+        </div>
+
+        <div>
+            <label for="">Quantité</label>
+            {{ form_widget(form.qty, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Prix Unitaire (Fc)</label>
+            {{ form_widget(form.prixUnitaire, {'attr': {'class': 'form-input'}}) }}
+        </div>
+        <div>
+            <label for="">Coût Total</label>
+            {{ form_widget(form.cout, {'attr': {'class': 'form-input', 'type':'number', 'readonly': 'readonly'}}) }}
+        </div>
+        <div>
+            <br>
+            <input type="submit" value="Enregistrer" class="btn btn-success">
+        </div>
+        {{ form_end(form) }}
+
+        {#    {{ include('approvisionnement/_form.html.twig') }}#}
+
+    </div>
+
+    <a href="{{ path('app_approvisionnement_index') }}">back to list</a>
+
+{#    {{ include('approvisionnement/_delete_form.html.twig') }}#}
+</div>
+<script>
+    const prixMap       = {{ prixMap|json_encode|raw }};
+    const selectProduit = document.getElementById('approvisionnement_produit');
+    const inputQty      = document.getElementById('approvisionnement_qty');
+    const inputPrix     = document.getElementById('approvisionnement_prixUnitaire');
+    const inputCout     = document.getElementById('approvisionnement_cout');
+
+    function recalculerCout() {
+        const qty  = parseFloat(inputQty.value)  || 0;
+        const prix = parseFloat(inputPrix.value) || 0;
+        inputCout.value = (qty * prix).toFixed(2);
+    }
+
+    if (selectProduit) {
+        NiceSelect.bind(selectProduit, { searchable: true, searchPlaceholder: 'Rechercher un produit...' });
+        selectProduit.addEventListener('change', function () {
+            inputPrix.value = prixMap[this.value] || 0;
+            recalculerCout();
+        });
+    }
+
+    if (inputQty)  inputQty.addEventListener('input',  recalculerCout);
+    if (inputPrix) inputPrix.addEventListener('input', recalculerCout);
+</script>
+    {% endblock %}

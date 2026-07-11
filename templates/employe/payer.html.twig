@@ -1,0 +1,135 @@
+{% extends 'components/layout/default.html.twig' %}
+
+{% block content %}
+
+<div class="panel">
+    <div class="flex justify-between mb-3">
+        <h1>Payer — {{ employe.nomcomplet }}</h1>
+        <a href="{{ path('app_employe_index') }}" class="btn btn-secondary btn-sm">Retour</a>
+    </div>
+    <table class="table mb-0">
+        <tr>
+            <th>Matricule</th>
+            <td>{{ employe.matricule }}</td>
+            <th>Titre</th>
+            <td>{{ employe.titre }}</td>
+            <th>Catégorie</th>
+            <td>{{ employe.categorie }}</td>
+            <th>Salaire journalier</th>
+            <td><strong>{{ employe.salaireJournalier ?? 0 | number_format(2) }}</strong></td>
+        </tr>
+    </table>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+
+    {# Formulaire de paie #}
+    <div class="panel">
+        <h2 class="text-lg font-semibold mb-4">Nouvelle paie</h2>
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('payer' ~ employe.id) }}">
+
+            <div class="mb-4">
+                <label class="block mb-1" for="periode">Période de paie</label>
+                <select class="form-input" name="periode" id="periode" required>
+                    <option value="">-- Choisir une période --</option>
+                    {% for periode in periodes %}
+                        <option value="{{ periode.id }}">{{ periode.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block mb-1" for="nb_jours">Nombre de jours travaillés</label>
+                <input type="number" name="nb_jours" id="nb_jours" class="form-input"
+                       min="1" max="31" value="{{ nbJoursDefaut }}" required
+                       oninput="calculer()">
+            </div>
+
+            <div class="mb-4">
+                <label class="block mb-1">Salaire de base (calculé)</label>
+                <input type="text" id="salaire_base" class="form-input bg-gray-100" readonly>
+            </div>
+
+            <div class="mb-4">
+                <label class="block mb-1" for="primes">Primes</label>
+                <input type="number" name="primes" id="primes" class="form-input"
+                       min="0" step="0.01" value="0" oninput="calculer()">
+            </div>
+
+            <div class="mb-4">
+                <label class="block mb-1" for="deductions">Déductions</label>
+                <input type="number" name="deductions" id="deductions" class="form-input"
+                       min="0" step="0.01" value="0" oninput="calculer()">
+            </div>
+
+            <div class="mb-4">
+                <label class="block mb-1">Total net</label>
+                <input type="text" id="total_net" class="form-input bg-gray-100 font-bold" readonly>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">Enregistrer la paie</button>
+        </form>
+    </div>
+
+    {# Historique des paies #}
+    <div class="panel">
+        <h2 class="text-lg font-semibold mb-4">Historique des paies</h2>
+        {% if paiesEmploye is empty %}
+            <p class="text-gray-500">Aucune paie enregistrée.</p>
+        {% else %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Période</th>
+                        <th>Jours</th>
+                        <th>Base</th>
+                        <th>Primes</th>
+                        <th>Déductions</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for paie in paiesEmploye %}
+                    <tr>
+                        <td>{{ paie.paie.label }}</td>
+                        <td>{{ paie.nbJours }}</td>
+                        <td>{{ paie.salaireBase | number_format(2) }}</td>
+                        <td>{{ paie.primes | number_format(2) }}</td>
+                        <td>{{ paie.deductions | number_format(2) }}</td>
+                        <td><strong>{{ paie.total | number_format(2) }}</strong></td>
+                        <td>{{ paie.createdAt ? paie.createdAt|date('d-m-Y') : '' }}</td>
+                        <td class="flex gap-1">
+                            <a href="{{ path('app_employe_fiche_paie', {'id': paie.id}) }}"
+                               class="btn btn-sm btn-secondary" target="_blank">Voir</a>
+                            <a href="{{ path('app_employe_fiche_paie_pdf', {'id': paie.id}) }}"
+                               class="btn btn-sm btn-success">PDF</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    const salaireJournalier = {{ employe.salaireJournalier ?? 0 }};
+
+    function calculer() {
+        const nbJours = parseFloat(document.getElementById('nb_jours').value) || 0;
+        const primes = parseFloat(document.getElementById('primes').value) || 0;
+        const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+        const base = salaireJournalier * nbJours;
+        const total = base + primes - deductions;
+        document.getElementById('salaire_base').value = base.toFixed(2);
+        document.getElementById('total_net').value = total.toFixed(2);
+    }
+
+    calculer();
+</script>
+
+{% endblock %}

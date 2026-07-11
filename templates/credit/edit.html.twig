@@ -1,0 +1,39 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+    <div class="panel">
+        <div class="flex justify-between mb-3">
+            <h1>Sortie de Caisse</h1>
+            <a class="border border-2 p-2 m2 text-white rounded bg-primary" href="{{ path('app_credit_new') }}">Nouvelle sortie</a>
+
+        </div>
+        <div>
+            <form action="" method="POST">
+                <div>
+                    <label for="devise">Devise</label>
+                    <select class="form-input" name="devise" id="devise">
+                        <option value="FC" {{ credit.devise == 'FC' or credit.devise is null ? 'selected' }}>FC</option>
+                        <option value="USD" {{ credit.devise == 'USD' ? 'selected' }}>USD</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="">Montant</label>
+                    <input type="number" id="montant" name="montant" inputmode="decimal" class="form-input" value="{{ credit.montant }}">
+
+                </div>
+                <div>
+                    <label for="">Raison</label>
+                    {#                {{ form_widget(form.raison, {'attr': {'class': 'form-input'}}) }}#}
+                    <textarea name="raison" id="raison" cols="30" class="form-input" rows="5" >{{ credit.raison }}</textarea>
+                </div>
+
+                <br>
+                <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+                {#    {{ include('credit/_form.html.twig') }}#}
+
+            </form>
+        </div>
+    </div>
+
+{#    {{ include('credit/_form.html.twig', {'button_label': 'Update'}) }}#}
+{#    {{ include('credit/_delete_form.html.twig') }}#}
+{% endblock %}
