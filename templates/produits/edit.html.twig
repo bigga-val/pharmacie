@@ -33,8 +33,11 @@
             {{ form_widget(form.prixAchat, {'attr': {'class': 'form-input'}}) }}
         </div>
         <div>
-            <label for="">Prix de vente (FC)</label>
-            {{ form_widget(form.prix, {'attr': {'class': 'form-input'}}) }}
+            <label>Prix de vente (FC)</label>
+            <div id="prix-preview" class="form-input bg-gray-100 text-gray-700">
+                {{ produit.prix|number_format(2, ',', '.') }} FC
+                <span class="text-xs text-gray-400 ml-2">(calculé automatiquement via la marge de la catégorie)</span>
+            </div>
         </div>
 
         <div>
@@ -75,4 +78,28 @@
     {{ include('produits/_delete_form.html.twig') }}
     </div>
 </div>
+
+<script>
+(function () {
+    const categories = {{ categoriesMap|json_encode|raw }};
+    const catSelect  = document.querySelector('#produits_Categorie');
+    const prixAchatInput = document.querySelector('#produits_prixAchat');
+    const preview    = document.querySelector('#prix-preview');
+
+    function updatePreview() {
+        const catId     = catSelect ? catSelect.value : null;
+        const prixAchat = parseFloat(prixAchatInput ? prixAchatInput.value : 0) || 0;
+        const pct       = (catId && categories[catId] !== undefined) ? categories[catId] : 0;
+        const prixVente = prixAchat * (1 + pct / 100);
+
+        preview.innerHTML = prixVente.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            + ' FC <span class="text-xs text-gray-400 ml-2">(marge ' + pct + '% — calculé automatiquement)</span>';
+    }
+
+    if (catSelect)     catSelect.addEventListener('change', updatePreview);
+    if (prixAchatInput) prixAchatInput.addEventListener('input', updatePreview);
+
+    updatePreview();
+})();
+</script>
 {% endblock %}

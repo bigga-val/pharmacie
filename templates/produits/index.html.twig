@@ -8,7 +8,10 @@
         <h1>Liste des produits</h1>
         <div class="flex gap-2 items-center">
             <div id="export-buttons"></div>
+            {% if is_granted('ROLE_PHARMACIEN') %}
+            <a class="btn btn-secondary" href="{{ path('app_produits_import') }}">Importer Excel</a>
             <a class="btn btn-primary" href="{{ path('app_produits_new') }}">Nouveau produit</a>
+            {% endif %}
         </div>
     </div>
 
@@ -33,13 +36,15 @@
                 <td>{{ produit.designation }}</td>
                 <td>{{ produit.categorie ? produit.categorie.designation : '—' }}</td>
                 <td>{{ produit.uniteMesure }}</td>
-                {% if is_granted('ROLE_ADMIN') %}<td>Fc {{ produit.prixAchat ? produit.prixAchat|number_format(2) : '—' }}</td>{% endif %}
+                {% if is_granted('ROLE_PHARMACIEN') %}<td>Fc {{ produit.prixAchat ? produit.prixAchat|number_format(2) : '—' }}</td>{% endif %}
                 <td>Fc {{ produit.prix|number_format(2) }}</td>
                 <td>{{ produit.minimum }}</td>
                 <td>{{ produit.maximum }}</td>
                 <td>
                     <a class="btn btn-sm btn-outline-primary" href="{{ path('app_produits_show', {'id': produit.id}) }}">Fiche</a>
+                    {% if is_granted('ROLE_PHARMACIEN') %}
                     <a class="btn btn-sm btn-primary" href="{{ path('app_produits_edit', {'id': produit.id}) }}">Éditer</a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}

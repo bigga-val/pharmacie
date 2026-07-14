@@ -26,19 +26,21 @@ class ProduitVenduController extends AbstractController
         $start = $request->query->get('start');
         $end = $request->query->get('end');
 
+        $status = $request->query->get('status', '');
+
         $start = $start ? new \DateTime($start) : new \DateTime('-30 days');
         $end   = $end   ? new \DateTime($end)   : new \DateTime('today');
 
-        $start->setTime(0, 0, 0);      // 00:00:00
+        $start->setTime(0, 0, 0);
         $end->setTime(23, 59, 59);
-        //dd(new \DateTime('today'), $end==null);
-        $produits = $produitVenduRepository->findByDateIntervalle($start, $end);
-        return $this->render('produit_vendu/index.html.twig', [
-            //'produit_vendus' => $produitVenduRepository->findBy([], ['createdAt' => 'DESC'] ),
-            'produit_vendus' => $produits,
-            'start' => $start,
-            'end' => $end,
 
+        $produits = $produitVenduRepository->findByDateIntervalle($start, $end, $status ?: null);
+
+        return $this->render('produit_vendu/index.html.twig', [
+            'produit_vendus' => $produits,
+            'start'          => $start,
+            'end'            => $end,
+            'status'         => $status,
         ]);
     }
 
@@ -55,11 +57,12 @@ class ProduitVenduController extends AbstractController
             $produit = $produitsRepository->find($request->query->get('produitID'));
             $produitVendu = new ProduitVendu();
             $produitVendu->setCreatedAt(new \DateTimeImmutable());
-            $produitVendu->setCreatedby($this->getUser()->getUsername());
+            $produitVendu->setCreatedby($this->getUser()->getUserIdentifier());
             $produitVendu->setQty($request->query->get('qty'));
             $produitVendu->setVente($venteRepository->find($request->query->get('venteID')));
             $produitVendu->setProduit($produit);
             $produitVendu->setPrixUnitaire($produit->getPrix());
+            $produitVendu->setTauxMarge($produit->getCategorie()?->getPourcentage() ?? 0);
             //$produitVendu->setTaux($request->getSession()->get('tauxactif'));
             $produitVendu->setTaux($tauxactif->getCout());
             $entityManager->persist($produitVendu);
@@ -90,7 +93,7 @@ class ProduitVenduController extends AbstractController
             return new JsonResponse([
                 'etat' => true
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return new JsonResponse([
                 'etat' => false
             ]);

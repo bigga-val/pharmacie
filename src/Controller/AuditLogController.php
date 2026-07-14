@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/audit')]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_PHARMACIEN')]
 class AuditLogController extends AbstractController
 {
     #[Route('/', name: 'app_audit_log_index', methods: ['GET'])]

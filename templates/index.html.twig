@@ -8,9 +8,11 @@
         <h1 class="text-2xl font-bold">Tableau de bord</h1>
         <p class="text-sm text-gray-500">{{ moisCourant }}</p>
     </div>
+    {% if is_granted('ROLE_PHARMACIEN') %}
     <a href="{{ path('app_audit_log_index') }}" class="btn btn-outline-primary text-sm">
         Journal d'audit
     </a>
+    {% endif %}
 </div>
 
 {# ===== KPI CARDS ===== #}
@@ -47,6 +49,7 @@
     </div>
     {% endif %}
 
+    {% if is_granted('ROLE_ADMIN') %}
     <div class="panel bg-gradient-to-r from-green-500 to-green-600 text-white">
         <div class="text-xs font-semibold uppercase opacity-80 mb-1">Crédits du mois</div>
         <div class="text-2xl font-bold">{{ totalCredits|number_format(0, ',', ' ') }}</div>
@@ -68,6 +71,7 @@
         <div class="text-2xl font-bold">{{ (totalCredits - totalDebits)|number_format(0, ',', ' ') }}</div>
         <div class="text-xs opacity-70 mt-1">Crédits − Débits</div>
     </div>
+    {% endif %}
 
     <div class="panel bg-gradient-to-r from-amber-500 to-amber-600 text-white">
         <div class="text-xs font-semibold uppercase opacity-80 mb-1">CA d'hier</div>
@@ -176,6 +180,7 @@
 
 </div>
 
+{% if is_granted('ROLE_PHARMACIEN') %}
 {# ===== ACTIVITE RECENTE (AUDIT) ===== #}
 <div class="panel">
     <div class="flex justify-between items-center mb-3">
@@ -213,6 +218,7 @@
         </tbody>
     </table>
 </div>
+{% endif %}
 
 {# ===== APEXCHARTS ===== #}
 <script>

@@ -83,6 +83,7 @@
             month: 'long',
             year: 'numeric'
         });
+
     </script>
 <script>
     $(document).ready(function() {
@@ -136,8 +137,11 @@
             setPrix()
     });
 
+    const userIsHabilite = {{ (is_granted('ROLE_INFIRMIERE') and not is_granted('ROLE_PHARMACIEN')) ? 'true' : 'false' }};
+
     //saving the invoice without pay
     $("#btnSaveInvoice").click(function(e) {
+        if (!userIsHabilite && !confirm("Attention : vous n'avez pas le rôle requis pour effectuer une vente.\n\nVoulez-vous continuer quand même ?")) return;
         $("a, button, span, input").attr("disabled", true)
 
         console.log("clicled")
@@ -206,6 +210,7 @@
 
     //saving the invoice and confirm invoice payment
     $("#btnSaveInvoice2").click(function(e) {
+        if (!userIsHabilite && !confirm("Attention : vous n'avez pas le rôle requis pour effectuer une vente.\n\nVoulez-vous continuer quand même ?")) return;
         $("a, button, span, input").attr("disabled", true)
 
         //console.log("clicled")
@@ -276,6 +281,7 @@
 
     //saving the invoice and confirm invoice payment
     $("#btnSaveInvoicePrint").click(function(e) {
+        if (!userIsHabilite && !confirm("Attention : vous n'avez pas le rôle requis pour effectuer une vente.\n\nVoulez-vous continuer quand même ?")) return;
         $("a, button, span, input").attr("disabled", true)
 
         //console.log("clicled")

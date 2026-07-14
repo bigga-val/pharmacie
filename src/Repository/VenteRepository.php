@@ -130,9 +130,8 @@ class VenteRepository extends ServiceEntityRepository
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-                select substring(pv.createdAt, 6, 2) mois, SUM(pv.qty * p.prix) montant
-                from App\Entity\Produits p, App\Entity\Approvisionnement pv
-                where p.id = pv.produit
+                select substring(pv.createdAt, 6, 2) mois, SUM(pv.cout) montant
+                from App\Entity\Approvisionnement pv
                 group by mois
             '
         );

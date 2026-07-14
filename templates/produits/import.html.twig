@@ -1,0 +1,190 @@
+{% extends 'components/layout/default.html.twig' %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto">
+
+    {# ── En-tête ── #}
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-xl font-bold">Importation de produits</h1>
+        <div class="flex gap-2">
+            <a href="{{ path('app_produits_import_template') }}" class="btn btn-secondary btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Télécharger le modèle Excel
+            </a>
+            <a href="{{ path('app_produits_index') }}" class="btn btn-outline-secondary btn-sm">Retour</a>
+        </div>
+    </div>
+
+    {# ── Rapport après import ── #}
+    {% if rapport is not null %}
+        {% set hasErrors = rapport.errors|length > 0 %}
+
+        <div class="panel mb-6">
+            <h2 class="font-semibold text-base mb-4">Résultat de l'import</h2>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="rounded-lg bg-success/10 border border-success/30 p-4 text-center">
+                    <div class="text-3xl font-bold text-success">{{ rapport.created }}</div>
+                    <div class="text-sm text-success font-medium mt-1">Produit{{ rapport.created != 1 ? 's' : '' }} créé{{ rapport.created != 1 ? 's' : '' }}</div>
+                </div>
+                <div class="rounded-lg bg-danger/10 border border-danger/30 p-4 text-center">
+                    <div class="text-3xl font-bold text-danger">{{ rapport.ignored }}</div>
+                    <div class="text-sm text-danger font-medium mt-1">Ligne{{ rapport.ignored != 1 ? 's' : '' }} ignorée{{ rapport.ignored != 1 ? 's' : '' }}</div>
+                </div>
+            </div>
+
+            {% if hasErrors %}
+                <button
+                    type="button"
+                    onclick="toggleErrors()"
+                    class="btn btn-sm btn-outline-danger w-full flex items-center justify-between"
+                    id="toggle-btn"
+                >
+                    <span>Voir les {{ rapport.errors|length }} erreur{{ rapport.errors|length != 1 ? 's' : '' }} de traitement</span>
+                    <svg id="chevron-icon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <div id="errors-panel" class="hidden mt-3">
+                    <div class="overflow-auto rounded-lg border border-danger/20">
+                        <table class="table text-sm w-full">
+                            <thead class="bg-danger/5">
+                                <tr>
+                                    <th class="w-16">Ligne</th>
+                                    <th>Désignation</th>
+                                    <th>Raison</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for err in rapport.errors %}
+                                <tr>
+                                    <td class="text-center font-mono text-gray-500">{{ err.ligne }}</td>
+                                    <td class="font-medium">{{ err.designation }}</td>
+                                    <td class="text-danger">{{ err.raison }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="mt-2 text-sm text-success font-medium text-center">
+                    Toutes les lignes ont été traitées avec succès.
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {# ── Formulaire d'upload ── #}
+    <div class="panel">
+        <h2 class="font-semibold text-base mb-1">Importer un fichier</h2>
+        <p class="text-sm text-gray-500 mb-4">
+            Formats acceptés : <strong>.xlsx</strong> ou <strong>.xls</strong>.
+            Utilisez le modèle fourni pour structurer correctement vos données.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" id="import-form">
+            <div
+                id="drop-zone"
+                class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                onclick="document.getElementById('fichier').click()"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-gray-600 font-medium" id="drop-label">Glissez votre fichier ici ou cliquez pour parcourir</p>
+                <p class="text-xs text-gray-400 mt-1">.xlsx ou .xls uniquement</p>
+                <input
+                    type="file"
+                    name="fichier"
+                    id="fichier"
+                    accept=".xlsx,.xls"
+                    class="hidden"
+                    onchange="onFileChange(this)"
+                >
+            </div>
+
+            <div class="mt-4 flex justify-end gap-2">
+                <button type="submit" id="submit-btn" class="btn btn-primary" disabled>
+                    Lancer l'import
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# ── Instructions ── #}
+    <div class="panel mt-4 text-sm text-gray-600">
+        <h3 class="font-semibold mb-2">Format attendu du fichier</h3>
+        <div class="overflow-auto">
+            <table class="table text-xs w-full">
+                <thead>
+                    <tr>
+                        <th>Colonne</th>
+                        <th>Champ</th>
+                        <th>Obligatoire</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>A</td><td>designation</td><td><span class="text-danger font-bold">Oui</span></td><td>Amoxicilline 500mg</td></tr>
+                    <tr><td>B</td><td>code</td><td><span class="text-danger font-bold">Oui</span></td><td>AMX500</td></tr>
+                    <tr><td>C</td><td>categorie</td><td><span class="text-danger font-bold">Oui</span></td><td>Antibiotiques</td></tr>
+                    <tr><td>D</td><td>prixAchat</td><td><span class="text-danger font-bold">Oui</span></td><td>560</td></tr>
+                    <tr><td>E</td><td>uniteMesure</td><td>Non</td><td>cp</td></tr>
+                    <tr><td>F</td><td>minimum</td><td>Non</td><td>50</td></tr>
+                    <tr><td>G</td><td>maximum</td><td>Non</td><td>200</td></tr>
+                    <tr><td>H</td><td>fabricant</td><td>Non</td><td>Beecham</td></tr>
+                    <tr><td>I</td><td>preemption</td><td>Non</td><td>2027-12-31</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mt-2 text-xs text-gray-400">La ligne 1 est considérée comme l'en-tête et est ignorée. Les codes en double sont ignorés.</p>
+    </div>
+
+</div>
+
+<script>
+    function onFileChange(input) {
+        const btn = document.getElementById('submit-btn');
+        const label = document.getElementById('drop-label');
+        if (input.files.length > 0) {
+            label.textContent = input.files[0].name;
+            btn.removeAttribute('disabled');
+        } else {
+            label.textContent = 'Glissez votre fichier ici ou cliquez pour parcourir';
+            btn.setAttribute('disabled', 'disabled');
+        }
+    }
+
+    function toggleErrors() {
+        const panel = document.getElementById('errors-panel');
+        const icon  = document.getElementById('chevron-icon');
+        const btn   = document.getElementById('toggle-btn');
+        const isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden', !isHidden);
+        icon.style.transform = isHidden ? 'rotate(180deg)' : '';
+        btn.querySelector('span').textContent = isHidden
+            ? 'Masquer les erreurs'
+            : 'Voir les {{ rapport is not null ? rapport.errors|length : 0 }} erreur{{ rapport is not null and rapport.errors|length != 1 ? "s" : "" }} de traitement';
+    }
+
+    // Drag & drop
+    const zone = document.getElementById('drop-zone');
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('border-primary', 'bg-primary/5'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('border-primary', 'bg-primary/5'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('border-primary', 'bg-primary/5');
+        const input = document.getElementById('fichier');
+        if (e.dataTransfer.files.length) {
+            const dt = new DataTransfer();
+            Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+            input.files = dt.files;
+            onFileChange(input);
+        }
+    });
+</script>
+
+{% endblock %}

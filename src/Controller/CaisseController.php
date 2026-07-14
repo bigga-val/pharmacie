@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/caisse')]
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_PHARMACIEN')]
 class CaisseController extends AbstractController
 {
     #[Route('/', name: 'app_caisse_index', methods: ['GET'])]

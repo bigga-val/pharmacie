@@ -26,7 +26,6 @@ class ProduitsType extends AbstractType
                 'choice_label' => 'designation',
             ])
             ->add('prixAchat')
-            ->add('prix')
             ->add('maximum')
             ->add('minimum')
             ->add('uniteMesure')

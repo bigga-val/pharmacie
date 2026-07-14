@@ -25,9 +25,9 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // ── 1. UTILISATEURS ─────────────────────────────────────────────────────
-        $admin = $this->makeUser('admin@afya.com',        'Admin',              ['ROLE_ADMIN'],  'No 1, Av. de la Santé',    $manager);
-        $this->makeUser('pharmacien@afya.com', 'Jean-Pierre Mukendi', ['ROLE_USER'],  'No 12, Av. Kabinda',       $manager);
-        $this->makeUser('caissier@afya.com',   'Marie Kabongo',       ['ROLE_USER'],  'No 45, Av. du Commerce',   $manager);
+        $admin = $this->makeUser('admin@afya.com',        'Admin',              ['ROLE_ADMIN'],        'No 1, Av. de la Santé',  $manager);
+        $this->makeUser('pharmacien@afya.com', 'Jean-Pierre Mukendi', ['ROLE_PHARMACIEN'],  'No 12, Av. Kabinda',     $manager);
+        $this->makeUser('infirmiere@afya.com', 'Marie Kabongo',       ['ROLE_INFIRMIERE'],  'No 45, Av. du Commerce', $manager);
 
         $manager->flush(); // flush users en premier (Taux.user en a besoin)
 
@@ -52,39 +52,40 @@ class AppFixtures extends Fixture
         $catHyg  = $this->makeCat('Hygiène & Soins',              15.0, $manager);
 
         // ── 4. PRODUITS ──────────────────────────────────────────────────────────
-        // Prix de vente / Prix d'achat en FC (Franc Congolais)
-        // Antibiotiques
-        $amx500  = $this->makeProd('Amoxicilline 500mg',                'Beecham',    1000,  'AMX500', 'cp',      200, 50,  '+18 months', $catAbx,  $manager,  560);
-        $cip500  = $this->makeProd('Ciprofloxacine 500mg',              'Cipla',      1500,  'CIP500', 'cp',      150, 30,  '+24 months', $catAbx,  $manager, 1260);
-        $mtr250  = $this->makeProd('Métronidazole 250mg',               'Medopharm',   500,  'MTR250', 'cp',      300, 60,  '+12 months', $catAbx,  $manager,  336);
-        // Analgésiques
-        $par500  = $this->makeProd('Paracétamol 500mg',                 'Gsk',         200,  'PAR500', 'cp',      500, 100, '+24 months', $catAnlg, $manager,  112);
-        // Anti-inflammatoires
-        $ibu400  = $this->makeProd('Ibuprofène 400mg',                  'Medopharm',   350,  'IBU400', 'cp',      300, 60,  '+18 months', $catAinf, $manager,  196);
-        $dic050  = $this->makeProd('Diclofénac 50mg',                   'Novartis',    400,  'DIC050', 'cp',      200, 40,  '+18 months', $catAinf, $manager,  224);
-        // Vitamines
-        $vtc1000 = $this->makeProd('Vitamine C 1000mg',                 'Bayer',       300,  'VTC100', 'cp',      400, 80,  '+36 months', $catVit,  $manager,  168);
-        $znc020  = $this->makeProd('Zinc 20mg',                         'Solgar',      200,  'ZNC020', 'cp',      300, 60,  '+36 months', $catVit,  $manager,  140);
-        $acf005  = $this->makeProd('Acide folique 5mg',                 'Medopharm',   150,  'ACF005', 'cp',      400, 80,  '+24 months', $catVit,  $manager,   84);
-        // Antiparasitaires
-        $art020  = $this->makeProd('Artémether/Luméfantrine 20/120mg',  'Novartis',   2500,  'ART020', 'cp',      200, 40,  '+24 months', $catPara, $manager, 1960);
-        $alb400  = $this->makeProd('Albendazole 400mg',                 'Gsk',        1000,  'ALB400', 'cp',      150, 30,  '+24 months', $catPara, $manager,  700);
-        // Antifongiques
-        $flu150  = $this->makeProd('Fluconazole 150mg',                 'Cipla',      3500,  'FLU150', 'cp',      100, 20,  '+18 months', $catFong, $manager, 2800);
-        // Dermatologie
-        $mic001  = $this->makeProd('Miconazole crème 2%',               'Janssen',    7000,  'MIC001', 'tube',    80,  15,  '+18 months', $catDerm, $manager, 5600);
-        // Pédiatrie
-        $syp120  = $this->makeProd('Sirop Paracétamol 120mg/5ml',       'Gsk',        4500,  'SYP120', 'flacon',  100, 20,  '+18 months', $catPed,  $manager, 3360);
-        $amxsus  = $this->makeProd('Amoxicilline susp. 125mg/5ml',      'Beecham',    6000,  'AMX125', 'flacon',  80,  15,  '+12 months', $catPed,  $manager, 4480);
-        // Cardiologie
-        $aml005  = $this->makeProd('Amlodipine 5mg',                    'Pfizer',      600,  'AML005', 'cp',      150, 30,  '+24 months', $catCard, $manager,  448);
-        // Diabétologie
-        $met500  = $this->makeProd('Metformine 500mg',                  'Medopharm',   500,  'MET500', 'cp',      200, 40,  '+18 months', $catDiab, $manager,  336);
-        // Matériel médical
-        $ser005  = $this->makeProd('Seringues 5ml',                     'BD',          900,  'SER005', 'pce',     500, 100, '+60 months', $catMat,  $manager,  700);
-        $gnt100  = $this->makeProd("Gants d'examen latex (boîte 100)",  'Kimberly',  15000,  'GNT100', 'boîte',   50,  10,  '+60 months', $catMat,  $manager, 11200);
-        // Hygiène
-        $cot100  = $this->makeProd('Coton hydrophile 100g',             'Hartmann',   3000,  'COT100', 'rouleau', 100, 20,  '+36 months', $catHyg,  $manager, 2240);
+        // Prix d'achat en FC — le prix de vente est calculé automatiquement :
+        // prix = prixAchat × (1 + categorie.Pourcentage / 100)
+        // Antibiotiques (10%)
+        $amx500  = $this->makeProd('Amoxicilline 500mg',               'Beecham',   'AMX500', 'cp',      200, 50,  '+18 months', $catAbx,  $manager,  560);
+        $cip500  = $this->makeProd('Ciprofloxacine 500mg',             'Cipla',     'CIP500', 'cp',      150, 30,  '+24 months', $catAbx,  $manager, 1260);
+        $mtr250  = $this->makeProd('Métronidazole 250mg',              'Medopharm', 'MTR250', 'cp',      300, 60,  '+12 months', $catAbx,  $manager,  336);
+        // Analgésiques (5%)
+        $par500  = $this->makeProd('Paracétamol 500mg',                'Gsk',       'PAR500', 'cp',      500, 100, '+24 months', $catAnlg, $manager,  112);
+        // Anti-inflammatoires (5%)
+        $ibu400  = $this->makeProd('Ibuprofène 400mg',                 'Medopharm', 'IBU400', 'cp',      300, 60,  '+18 months', $catAinf, $manager,  196);
+        $dic050  = $this->makeProd('Diclofénac 50mg',                  'Novartis',  'DIC050', 'cp',      200, 40,  '+18 months', $catAinf, $manager,  224);
+        // Vitamines (15%)
+        $vtc1000 = $this->makeProd('Vitamine C 1000mg',                'Bayer',     'VTC100', 'cp',      400, 80,  '+36 months', $catVit,  $manager,  168);
+        $znc020  = $this->makeProd('Zinc 20mg',                        'Solgar',    'ZNC020', 'cp',      300, 60,  '+36 months', $catVit,  $manager,  140);
+        $acf005  = $this->makeProd('Acide folique 5mg',                'Medopharm', 'ACF005', 'cp',      400, 80,  '+24 months', $catVit,  $manager,   84);
+        // Antiparasitaires (8%)
+        $art020  = $this->makeProd('Artémether/Luméfantrine 20/120mg', 'Novartis',  'ART020', 'cp',      200, 40,  '+24 months', $catPara, $manager, 1960);
+        $alb400  = $this->makeProd('Albendazole 400mg',                'Gsk',       'ALB400', 'cp',      150, 30,  '+24 months', $catPara, $manager,  700);
+        // Antifongiques (10%)
+        $flu150  = $this->makeProd('Fluconazole 150mg',                'Cipla',     'FLU150', 'cp',      100, 20,  '+18 months', $catFong, $manager, 2800);
+        // Dermatologie (12%)
+        $mic001  = $this->makeProd('Miconazole crème 2%',              'Janssen',   'MIC001', 'tube',    80,  15,  '+18 months', $catDerm, $manager, 5600);
+        // Pédiatrie (8%)
+        $syp120  = $this->makeProd('Sirop Paracétamol 120mg/5ml',      'Gsk',       'SYP120', 'flacon',  100, 20,  '+18 months', $catPed,  $manager, 3360);
+        $amxsus  = $this->makeProd('Amoxicilline susp. 125mg/5ml',     'Beecham',   'AMX125', 'flacon',  80,  15,  '+12 months', $catPed,  $manager, 4480);
+        // Cardiologie (10%)
+        $aml005  = $this->makeProd('Amlodipine 5mg',                   'Pfizer',    'AML005', 'cp',      150, 30,  '+24 months', $catCard, $manager,  448);
+        // Diabétologie (10%)
+        $met500  = $this->makeProd('Metformine 500mg',                 'Medopharm', 'MET500', 'cp',      200, 40,  '+18 months', $catDiab, $manager,  336);
+        // Matériel médical (15%)
+        $ser005  = $this->makeProd('Seringues 5ml',                    'BD',        'SER005', 'pce',     500, 100, '+60 months', $catMat,  $manager,  700);
+        $gnt100  = $this->makeProd("Gants d'examen latex (boîte 100)", 'Kimberly',  'GNT100', 'boîte',   50,  10,  '+60 months', $catMat,  $manager, 11200);
+        // Hygiène (15%)
+        $cot100  = $this->makeProd('Coton hydrophile 100g',            'Hartmann',  'COT100', 'rouleau', 100, 20,  '+36 months', $catHyg,  $manager, 2240);
 
         $manager->flush(); // flush catégories + produits
 
@@ -190,23 +191,26 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         // ── 10. PRODUITS VENDUS ───────────────────────────────────────────────────
-        // [index_vente, produit, qty, prixUnitaire_FC]
+        // prixUnitaire = prix de vente calculé du produit (prixAchat × (1 + marge%))
+        // tauxMarge    = pourcentage de la catégorie au moment de la vente (snapshot)
         $lignes = [
-            [0, $par500,  20,   200],  [0, $vtc1000, 10,   300],
-            [1, $art020,   6,  2500],  [1, $alb400,   3,  1000],
-            [2, $amx500,  20,  1000],  [2, $par500,  10,   200],
-            [3, $ibu400,  15,   350],  [3, $dic050,  10,   400],
-            [4, $flu150,   5,  3500],  [4, $mic001,   3,  7000],
-            [5, $syp120,   4,  4500],  [5, $par500,  30,   200],
-            [6, $cip500,  10,  1500],  [6, $mtr250,  20,   500],
-            [7, $met500,  30,   500],  [7, $aml005,  30,   600],
-            [8, $ser005,  50,   900],  [8, $gnt100,   5, 15000],
-            [9, $par500,  15,   200],  [9, $art020,   4,  2500],
+            [0, $par500,  20], [0, $vtc1000, 10],
+            [1, $art020,   6], [1, $alb400,   3],
+            [2, $amx500,  20], [2, $par500,  10],
+            [3, $ibu400,  15], [3, $dic050,  10],
+            [4, $flu150,   5], [4, $mic001,   3],
+            [5, $syp120,   4], [5, $par500,  30],
+            [6, $cip500,  10], [6, $mtr250,  20],
+            [7, $met500,  30], [7, $aml005,  30],
+            [8, $ser005,  50], [8, $gnt100,   5],
+            [9, $par500,  15], [9, $art020,   4],
         ];
-        foreach ($lignes as [$vi, $prod, $qty, $pu]) {
+        foreach ($lignes as [$vi, $prod, $qty]) {
             $pv = new ProduitVendu();
             $pv->setVente($ventes[$vi])->setProduit($prod)->setQty((float)$qty)
-               ->setPrixUnitaire($pu)->setTaux(2800.0)
+               ->setPrixUnitaire($prod->getPrix())
+               ->setTauxMarge($prod->getCategorie()?->getPourcentage() ?? 0)
+               ->setTaux(2800.0)
                ->setCreatedAt(new \DateTimeImmutable())->setCreatedby('caissier@afya.com');
             $manager->persist($pv);
         }
@@ -272,13 +276,14 @@ class AppFixtures extends Fixture
     }
 
     private function makeProd(
-        string $designation, string $fabricant, float $prix, string $code,
+        string $designation, string $fabricant, string $code,
         string $unite, float $max, float $min, string $preemption,
         CategorieProduit $cat, ObjectManager $m, float $prixAchat = 0.0
     ): Produits {
+        $prix = $prixAchat * (1 + ($cat->getPourcentage() ?? 0) / 100);
         $p = new Produits();
-        $p->setDesignation($designation)->setFabricant($fabricant)->setPrix($prix)
-          ->setPrixAchat($prixAchat)
+        $p->setDesignation($designation)->setFabricant($fabricant)
+          ->setPrixAchat($prixAchat)->setPrix($prix)
           ->setCode($code)->setUniteMesure($unite)->setMaximum($max)->setMinimum($min)
           ->setPreemption(new \DateTime($preemption))->setCategorie($cat);
         $m->persist($p);

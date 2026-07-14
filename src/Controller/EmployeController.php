@@ -9,14 +9,16 @@ use App\Form\EmployeType;
 use App\Repository\EmployeRepository;
 use App\Repository\PaieEmployeRepository;
 use App\Repository\PaieRepository;
-use App\Service\PdfService;
+use App\Service\FPdfGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/employe')]
+#[IsGranted('ROLE_ADMIN')]
 class EmployeController extends AbstractController
 {
     #[Route('/', name: 'app_employe_index', methods: ['GET'])]
@@ -147,24 +149,20 @@ class EmployeController extends AbstractController
     }
 
     #[Route('/fiche-paie/{id}/pdf', name: 'app_employe_fiche_paie_pdf', methods: ['GET'])]
-    public function fichePaiePdf(PaieEmploye $paieEmploye, PdfService $pdfService): Response
+    public function fichePaiePdf(PaieEmploye $paieEmploye, FPdfGenerator $pdfGenerator): Response
     {
-        $employe = $paieEmploye->getEmploye();
-        $html = $this->renderView('employe/fiche_paie.html.twig', [
-            'paieEmploye' => $paieEmploye,
-            'employe'     => $employe,
-            'isPdf'       => true,
-            'logoBase64'  => $this->getLogoBase64(),
-        ]);
+        $pdfContent = $pdfGenerator->generateFichePaiePdf($paieEmploye);
 
+        $employe  = $paieEmploye->getEmploye();
         $filename = sprintf('fiche-paie-%s-%s.pdf',
             strtolower(str_replace(' ', '-', $employe->getNomcomplet())),
             $paieEmploye->getPaie()->getLabel()
         );
 
-        $pdfService->downloadPdfFile($html, $filename);
-
-        return new Response('', 200, ['Content-Type' => 'application/pdf']);
+        return new Response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     private function getLogoBase64(): string

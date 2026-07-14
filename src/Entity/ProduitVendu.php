@@ -34,6 +34,9 @@ class ProduitVendu
     #[ORM\Column(nullable: true)]
     private ?float $taux = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $tauxMarge = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +122,18 @@ class ProduitVendu
     public function setTaux(?float $taux): static
     {
         $this->taux = $taux;
+
+        return $this;
+    }
+
+    public function getTauxMarge(): ?float
+    {
+        return $this->tauxMarge;
+    }
+
+    public function setTauxMarge(?float $tauxMarge): static
+    {
+        $this->tauxMarge = $tauxMarge;
 
         return $this;
     }

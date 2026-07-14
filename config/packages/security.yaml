@@ -28,6 +28,11 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+    role_hierarchy:
+        ROLE_ADMIN:       [ROLE_PHARMACIEN]
+        ROLE_PHARMACIEN:  [ROLE_INFIRMIERE]
+        ROLE_INFIRMIERE:  [ROLE_USER]
+
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:

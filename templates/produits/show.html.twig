@@ -1,42 +1,11 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
 
-{# ===== HEADER ===== #}
-<div class="flex items-start justify-between mb-6">
-    <div class="flex items-center gap-4">
-        {% if produit.image %}
-            <img src="{{ asset('uploads/produits/' ~ produit.image) }}"
-                 alt="{{ produit.designation }}"
-                 class="h-20 w-20 object-cover rounded-lg border shadow-sm">
-        {% else %}
-            <div class="h-20 w-20 rounded-lg border bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </div>
-        {% endif %}
-        <div>
-            <div class="flex items-center gap-3 mb-1">
-                <span class="text-gray-400 font-mono text-sm">{{ produit.code }}</span>
-                {% if produit.categorie %}
-                    <span class="badge bg-info">{{ produit.categorie.designation }}</span>
-                {% endif %}
-            </div>
-            <h1 class="text-2xl font-bold">{{ produit.designation }}</h1>
-        </div>
-    </div>
-    <div class="flex gap-2">
-        <a href="{{ path('app_produits_index') }}" class="btn btn-outline-secondary btn-sm">← Retour</a>
-        <a href="{{ path('app_produits_edit', {'id': produit.id}) }}" class="btn btn-primary btn-sm">Éditer</a>
-        <form method="post" action="{{ path('app_produits_delete', {'id': produit.id}) }}"
-              onsubmit="return confirm('Supprimer ce produit ?');" class="inline">
-            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
-            <button class="btn btn-danger btn-sm">Supprimer</button>
-        </form>
-    </div>
-</div>
+{% set balance = 0 %}
+{% set stockClass = 'from-gray-400 to-gray-500' %}
+{% set stockLabel = 'Inconnu' %}
+{% set stockPct   = 0 %}
 
-{# ===== KPI STOCK ===== #}
 {% if stock %}
     {% set balance = stock.totalEntree - stock.totalSortie - stock.totalReserve %}
     {% set seuil   = stock.minimum * 1.1 %}
@@ -50,12 +19,85 @@
         {% set stockClass = 'from-red-500 to-red-600' %}
         {% set stockLabel = 'Critique' %}
     {% endif %}
-<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    {% if stock.maximum > 0 %}
+        {% set stockPct = min(((balance / stock.maximum) * 100)|round, 100) %}
+    {% endif %}
+{% endif %}
 
-    <div class="panel bg-gradient-to-r {{ stockClass }} text-white">
-        <div class="text-xs font-semibold uppercase opacity-80 mb-1">Stock disponible</div>
-        <div class="text-3xl font-bold">{{ balance }}</div>
-        <div class="text-xs opacity-70 mt-1">{{ produit.uniteMesure }} — {{ stockLabel }}</div>
+{# ===== HEADER ===== #}
+<div class="panel mb-4">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+
+        {# Image + identité #}
+        <div class="flex items-center gap-5">
+            {% if produit.image %}
+                <img src="{{ asset('uploads/produits/' ~ produit.image) }}"
+                     alt="{{ produit.designation }}"
+                     class="h-24 w-24 object-cover rounded-xl border shadow-sm flex-shrink-0">
+            {% else %}
+                <div class="h-24 w-24 rounded-xl border bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                    </svg>
+                </div>
+            {% endif %}
+
+            <div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="font-mono text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ produit.code ?? '—' }}</span>
+                    {% if produit.categorie %}
+                        <span class="badge bg-info">{{ produit.categorie.designation }}</span>
+                    {% endif %}
+                    {% if produit.preemption %}
+                        {% set today = "now"|date("Y-m-d") %}
+                        {% set exp   = produit.preemption|date("Y-m-d") %}
+                        {% if exp < today %}
+                            <span class="badge bg-danger">Périmé</span>
+                        {% elseif exp <= ("now +30 days")|date("Y-m-d") %}
+                            <span class="badge bg-warning">Expire bientôt</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <h1 class="text-2xl font-bold leading-tight">{{ produit.designation }}</h1>
+                {% if produit.fabricant %}
+                    <p class="text-sm text-gray-400 mt-1">{{ produit.fabricant }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Actions #}
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ path('app_produits_index') }}" class="btn btn-outline-secondary btn-sm">← Retour</a>
+            {% if is_granted('ROLE_PHARMACIEN') %}
+            <a href="{{ path('app_produits_edit', {'id': produit.id}) }}" class="btn btn-primary btn-sm">Éditer</a>
+            <form method="post" action="{{ path('app_produits_delete', {'id': produit.id}) }}"
+                  onsubmit="return confirm('Supprimer ce produit ?');" class="inline">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                <button class="btn btn-danger btn-sm">Supprimer</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{# ===== CARTES STOCK ===== #}
+{% if stock %}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+
+    {# Stock dispo #}
+    <div class="panel bg-gradient-to-r {{ stockClass }} text-white col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between mb-2">
+            <div class="text-xs font-semibold uppercase opacity-80">Stock disponible</div>
+            <span class="text-xs font-bold bg-white/20 rounded-full px-2 py-0.5">{{ stockLabel }}</span>
+        </div>
+        <div class="text-3xl font-bold mb-1">{{ balance }}</div>
+        <div class="text-xs opacity-70 mb-2">{{ produit.uniteMesure }}</div>
+        {% if stock.maximum > 0 %}
+        <div class="w-full bg-white/25 rounded-full h-1.5">
+            <div class="bg-white h-1.5 rounded-full transition-all" style="width: {{ stockPct }}%"></div>
+        </div>
+        <div class="text-xs opacity-60 mt-1">{{ stockPct }}% du max ({{ stock.maximum }})</div>
+        {% endif %}
     </div>
 
     <div class="panel bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -79,126 +121,201 @@
 </div>
 {% endif %}
 
-{# ===== INFOS + HISTORIQUE ===== #}
-<div class="grid xl:grid-cols-3 gap-4">
+{# ===== TABS ===== #}
+<div class="panel" x-data="{ tab: 'info' }">
 
-    {# Infos produit #}
-    <div class="panel">
-        <h5 class="font-semibold text-lg mb-4">Informations</h5>
-        <dl class="space-y-3 text-sm">
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Code</dt>
-                <dd class="font-mono font-medium">{{ produit.code ?? '—' }}</dd>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Catégorie</dt>
-                <dd>{{ produit.categorie ? produit.categorie.designation : '—' }}</dd>
-            </div>
-            {% if is_granted('ROLE_ADMIN') %}
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Prix d'achat</dt>
-                <dd class="font-semibold">Fc {{ produit.prixAchat ? produit.prixAchat|number_format(2) : '—' }}</dd>
-            </div>
+    {# Barre d'onglets #}
+    <div class="flex flex-wrap border-b border-gray-200 dark:border-gray-700 mb-6 gap-1">
+        <button type="button"
+            class="px-5 py-3 text-sm font-medium border-b-2 transition-colors"
+            :class="tab === 'info' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            @click="tab = 'info'">
+            Informations
+        </button>
+        {% if is_granted('ROLE_ADMIN') %}
+        <button type="button"
+            class="px-5 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2"
+            :class="tab === 'entrees' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            @click="tab = 'entrees'">
+            Entrées
+            {% if dernieresEntrees|length > 0 %}
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">
+                {{ dernieresEntrees|length }}
+            </span>
             {% endif %}
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Prix de vente</dt>
-                <dd class="font-semibold">Fc {{ produit.prix|number_format(2) }}</dd>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Unité de mesure</dt>
-                <dd>{{ produit.uniteMesure ?? '—' }}</dd>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Stock minimum</dt>
-                <dd>{{ produit.minimum ?? '—' }}</dd>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Stock maximum</dt>
-                <dd>{{ produit.maximum ?? '—' }}</dd>
-            </div>
-            <div class="flex justify-between border-b pb-2">
-                <dt class="text-gray-500">Fabricant</dt>
-                <dd>{{ produit.fabricant ?? '—' }}</dd>
-            </div>
-            <div class="flex justify-between">
-                <dt class="text-gray-500">Date de péremption</dt>
-                <dd>{{ produit.preemption ? produit.preemption|date('d/m/Y') : '—' }}</dd>
-            </div>
-        </dl>
+        </button>
+        {% endif %}
+        <button type="button"
+            class="px-5 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2"
+            :class="tab === 'sorties' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            @click="tab = 'sorties'">
+            Sorties
+            {% if dernieresSorties|length > 0 %}
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-violet-100 text-violet-700">
+                {{ dernieresSorties|length }}
+            </span>
+            {% endif %}
+        </button>
     </div>
 
-    {# Dernières entrées — admin uniquement (prix d'achat) #}
+    {# ── Tab : Informations ── #}
+    <div x-show="tab === 'info'" x-cloak>
+        <div class="grid sm:grid-cols-2 gap-x-12 gap-y-3 text-sm max-w-2xl">
+
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Code</span>
+                <span class="font-mono font-medium">{{ produit.code ?? '—' }}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Catégorie</span>
+                <span>{{ produit.categorie ? produit.categorie.designation : '—' }}</span>
+            </div>
+
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Unité de mesure</span>
+                <span>{{ produit.uniteMesure ?? '—' }}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Fabricant</span>
+                <span>{{ produit.fabricant ?? '—' }}</span>
+            </div>
+
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Prix de vente</span>
+                <span class="font-semibold text-primary">Fc {{ produit.prix|number_format(2, ',', ' ') }}</span>
+            </div>
+            {% if is_granted('ROLE_PHARMACIEN') %}
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Prix d'achat</span>
+                <span class="font-semibold">Fc {{ produit.prixAchat ? produit.prixAchat|number_format(2, ',', ' ') : '—' }}</span>
+            </div>
+            {% endif %}
+
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Stock minimum</span>
+                <span>{{ produit.minimum ?? '—' }}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+                <span class="text-gray-500">Stock maximum</span>
+                <span>{{ produit.maximum ?? '—' }}</span>
+            </div>
+
+            <div class="flex justify-between pb-2 sm:col-span-2">
+                <span class="text-gray-500">Date de péremption</span>
+                {% if produit.preemption %}
+                    {% set today = "now"|date("Y-m-d") %}
+                    {% set exp   = produit.preemption|date("Y-m-d") %}
+                    {% if exp < today %}
+                        <span class="font-semibold text-danger">{{ produit.preemption|date('d/m/Y') }} — Périmé</span>
+                    {% elseif exp <= ("now +30 days")|date("Y-m-d") %}
+                        <span class="font-semibold text-warning">{{ produit.preemption|date('d/m/Y') }} — Expire bientôt</span>
+                    {% else %}
+                        <span>{{ produit.preemption|date('d/m/Y') }}</span>
+                    {% endif %}
+                {% else %}
+                    <span>—</span>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    {# ── Tab : Entrées ── #}
     {% if is_granted('ROLE_ADMIN') %}
-    <div class="panel">
+    <div x-show="tab === 'entrees'" x-cloak>
         <div class="flex justify-between items-center mb-4">
-            <h5 class="font-semibold text-lg">Dernières entrées</h5>
-            <a href="{{ path('app_approvisionnement_index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+            <p class="text-sm text-gray-500">8 derniers approvisionnements</p>
+            <a href="{{ path('app_approvisionnement_index') }}" class="text-primary text-sm hover:underline">Voir tout →</a>
         </div>
         {% if dernieresEntrees %}
-        <table class="table text-sm">
+        <div class="overflow-auto">
+        <table class="table text-sm w-full">
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Qté</th>
-                    <th>Coût (Fc)</th>
+                    <th>Type</th>
+                    <th class="text-right">Qté</th>
+                    <th class="text-right">Coût (Fc)</th>
                     <th>Par</th>
                 </tr>
             </thead>
             <tbody>
             {% for entree in dernieresEntrees %}
                 <tr>
-                    <td>{{ entree.createdAt ? entree.createdAt|date('d/m/Y') : '—' }}</td>
-                    <td class="font-medium">{{ entree.qty }}</td>
-                    <td>{{ entree.cout ? entree.cout|number_format(0, ',', ' ') : '—' }}</td>
-                    <td>{{ entree.createdBy ?? '—' }}</td>
+                    <td class="whitespace-nowrap">{{ entree.createdAt ? entree.createdAt|date('d/m/Y') : '—' }}</td>
+                    <td>
+                        {% if entree.type == 'ajustement' %}
+                            <span class="badge bg-warning">Ajustement</span>
+                        {% else %}
+                            <span class="badge bg-info">Appro.</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right font-medium {{ entree.qty < 0 ? 'text-danger' : '' }}">
+                        {{ entree.qty > 0 ? '+' : '' }}{{ entree.qty }}
+                    </td>
+                    <td class="text-right text-gray-500">{{ entree.cout ? entree.cout|number_format(0, ',', ' ') : '—' }}</td>
+                    <td class="text-gray-500">{{ entree.createdBy ?? '—' }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
-            <p class="text-gray-400 text-sm">Aucun approvisionnement enregistré.</p>
+            <div class="text-center text-gray-400 py-10">Aucun approvisionnement enregistré.</div>
         {% endif %}
     </div>
-    {% endif %}{# end ROLE_ADMIN #}
+    {% endif %}
 
-    {# Dernières sorties #}
-    <div class="panel">
+    {# ── Tab : Sorties ── #}
+    <div x-show="tab === 'sorties'" x-cloak>
         <div class="flex justify-between items-center mb-4">
-            <h5 class="font-semibold text-lg">Dernières sorties</h5>
-            <a href="{{ path('app_vente_index') }}" class="text-primary text-sm hover:underline">Voir tout</a>
+            <p class="text-sm text-gray-500">8 dernières ventes</p>
+            <a href="{{ path('app_vente_index') }}" class="text-primary text-sm hover:underline">Voir tout →</a>
         </div>
         {% if dernieresSorties %}
-        <table class="table text-sm">
+        <div class="overflow-auto">
+        <table class="table text-sm w-full">
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Qté</th>
-                    <th>Prix unit.</th>
+                    <th class="text-right">Qté</th>
+                    <th class="text-right">Prix unit. (Fc)</th>
                     <th>Vente</th>
+                    <th>Statut</th>
                 </tr>
             </thead>
             <tbody>
             {% for sortie in dernieresSorties %}
                 <tr>
-                    <td>{{ sortie.createdAt ? sortie.createdAt|date('d/m/Y') : '—' }}</td>
-                    <td class="font-medium">{{ sortie.qty }}</td>
-                    <td>{{ sortie.prixUnitaire ? sortie.prixUnitaire|number_format(0, ',', ' ') : '—' }}</td>
+                    <td class="whitespace-nowrap">{{ sortie.createdAt ? sortie.createdAt|date('d/m/Y') : '—' }}</td>
+                    <td class="text-right font-medium">{{ sortie.qty }}</td>
+                    <td class="text-right text-gray-500">{{ sortie.prixUnitaire ? sortie.prixUnitaire|number_format(0, ',', ' ') : '—' }}</td>
                     <td>
                         {% if sortie.vente %}
                             <a href="{{ path('app_vente_show', {'id': sortie.vente.id}) }}"
-                               class="text-primary hover:underline">
+                               class="text-primary hover:underline font-mono text-xs">
                                 {{ sortie.vente.numeroVente ?? '#'~sortie.vente.id }}
                             </a>
-                        {% else %}
-                            —
-                        {% endif %}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if sortie.vente %}
+                            {% if sortie.vente.statusVente == 'paid' %}
+                                <span class="badge bg-success">Payée</span>
+                            {% elseif sortie.vente.statusVente == 'progress' %}
+                                <span class="badge bg-warning">En cours</span>
+                            {% else %}
+                                <span class="badge bg-danger">Annulée</span>
+                            {% endif %}
+                        {% else %}—{% endif %}
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
-            <p class="text-gray-400 text-sm">Aucune vente enregistrée.</p>
+            <div class="text-center text-gray-400 py-10">Aucune vente enregistrée.</div>
         {% endif %}
     </div>
 

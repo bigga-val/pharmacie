@@ -1,125 +1,202 @@
 {% extends 'components/layout/default.html.twig' %}
 {% block content %}
-<div class="panel">
-    <div class="panel-body">
-        <form action="" class="flex d-flex inline-block">
-            <div class="form-group p-2">
-                <label for="start">Debut</label>
-                <input type="date" name="start" class="form-input" value="{{ start|date('Y-m-d') }}">
-            </div>
 
-            <div class="form-group p-2">
-                <label for="end">Fin</label>
-                <input type="date" name="end" class="form-input" value="{{ end|date('Y-m-d') }}">
-            </div>
-            <div class="form-group p-2">
-                <label for=""> -</label>
-                <input type="submit" value="Rechercher" class="btn btn-primary">
-            </div>
-            <div class="form-group p-2">
-                <label for=""> -</label>
-                <a href="{{ path("app_produit_vendu_index") }}" class="btn btn-primary"> Rafraichir</a>
-            </div>
-        </form>
-    </div>
-</div>
 <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/buttons.dataTables.min.css') }}">
+
+{# ── Filtres ── #}
+<div class="panel mb-4">
+    <form action="" method="get" class="flex flex-wrap gap-4 items-end">
+        <div class="form-group">
+            <label class="text-sm font-medium">Début</label>
+            <input type="date" name="start" class="form-input" value="{{ start|date('Y-m-d') }}">
+        </div>
+        <div class="form-group">
+            <label class="text-sm font-medium">Fin</label>
+            <input type="date" name="end" class="form-input" value="{{ end|date('Y-m-d') }}">
+        </div>
+        <div class="form-group">
+            <label class="text-sm font-medium">Statut</label>
+            <select name="status" class="form-input">
+                <option value="">Tous</option>
+                <option value="paid"     {% if status == 'paid'     %}selected{% endif %}>Payé</option>
+                <option value="progress" {% if status == 'progress' %}selected{% endif %}>En cours</option>
+                <option value="canceled" {% if status == 'canceled' %}selected{% endif %}>Annulé</option>
+            </select>
+        </div>
+        <div class="form-group flex gap-2">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            <a href="{{ path('app_produit_vendu_index') }}" class="btn btn-secondary">Réinitialiser</a>
+        </div>
+    </form>
+</div>
+
+{# ── Calcul des totaux ── #}
+{% set totalCA = 0 %}
+{% set totalCout = 0 %}
+{% for pv in produit_vendus %}
+    {% if pv.vente.statusVente != 'canceled' %}
+        {% set lignCA   = pv.qty * pv.prixUnitaire %}
+        {% set lignCout = pv.qty * (pv.produit.prixAchat ?? 0) %}
+        {% set totalCA   = totalCA   + lignCA %}
+        {% set totalCout = totalCout + lignCout %}
+    {% endif %}
+{% endfor %}
+{% set totalMarge    = totalCA - totalCout %}
+{% set tauxMargGlobal = totalCA > 0 ? (totalMarge / totalCA * 100)|round(1) : 0 %}
+
+{# ── Bandeau récapitulatif ── #}
+{% if produit_vendus|length > 0 %}
+<div class="grid grid-cols-2 md:grid-cols-{{ is_granted('ROLE_PHARMACIEN') ? '4' : '1' }} gap-4 mb-4">
+    <div class="panel text-center">
+        <div class="text-xs text-gray-500 uppercase font-semibold mb-1">Chiffre d'affaires</div>
+        <div class="text-xl font-bold text-primary">{{ totalCA|number_format(0, ',', ' ') }} FC</div>
+    </div>
+    {% if is_granted('ROLE_PHARMACIEN') %}
+    <div class="panel text-center">
+        <div class="text-xs text-gray-500 uppercase font-semibold mb-1">Coût d'achat</div>
+        <div class="text-xl font-bold text-warning">{{ totalCout|number_format(0, ',', ' ') }} FC</div>
+    </div>
+    <div class="panel text-center">
+        <div class="text-xs text-gray-500 uppercase font-semibold mb-1">Marge brute</div>
+        <div class="text-xl font-bold {{ totalMarge >= 0 ? 'text-success' : 'text-danger' }}">
+            {{ totalMarge|number_format(0, ',', ' ') }} FC
+        </div>
+    </div>
+    <div class="panel text-center">
+        <div class="text-xs text-gray-500 uppercase font-semibold mb-1">Taux de marge</div>
+        <div class="text-xl font-bold {{ tauxMargGlobal >= 20 ? 'text-success' : (tauxMargGlobal >= 0 ? 'text-warning' : 'text-danger') }}">
+            {{ tauxMargGlobal }} %
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{# ── Tableau ── #}
 <div class="panel">
-    <div class="flex justify-between mb-3">
-        <h1>Liste des Produits vendus du {{ start|date('d-m-Y H:i:s') }} au {{ end|date('d-m-Y  H:i:s') }}</h1>
+    <div class="flex justify-between items-center mb-3">
+        <h1 class="text-lg font-semibold">
+            Produits vendus — {{ start|date('d/m/Y') }} au {{ end|date('d/m/Y') }}
+            {% if status %}<span class="text-sm font-normal text-gray-500">({{ status }})</span>{% endif %}
+        </h1>
         <div id="export-buttons"></div>
     </div>
 
     <table id="datatable" class="table">
         <thead>
             <tr>
-                <th>Vente No</th>
+                <th>Facture</th>
                 <th>Produit</th>
-                <th>Qty</th>
-                <th>Prix</th>
-                <th>Total</th>
-                <th>Date et heure</th>
-                <th>Ops</th>
-                <th>actions</th>
+                <th>Catégorie</th>
+                <th>Statut</th>
+                <th>Qté</th>
+                <th>Prix vente (FC)</th>
+                {% if is_granted('ROLE_PHARMACIEN') %}
+                <th>Prix achat (FC)</th>
+                {% endif %}
+                <th>Total vente (FC)</th>
+                {% if is_granted('ROLE_PHARMACIEN') %}
+                <th>Coût achat (FC)</th>
+                <th>Marge (FC)</th>
+                <th>Marge %</th>
+                {% endif %}
+                <th>Date</th>
+                <th>Opérateur</th>
             </tr>
         </thead>
-        <tbody id="myTable">
-        {% set total = 0 %}
-        {% set grandtotal = 0 %}
-
-        {% for produit_vendu in produit_vendus %}
-            <tr>
-                <td>{{ produit_vendu.vente ? produit_vendu.vente.numeroVente : '-' }}</td>
-                <td>{{ produit_vendu.produit.designation }}</td>
-                <td>{{ produit_vendu.qty }}</td>
-                <td>{{ produit_vendu.prixUnitaire }}</td>
-                {% set total = produit_vendu.prixUnitaire * produit_vendu.qty  %}
-                {% set grandtotal = grandtotal + total %}
-                <td>{{ total }}</td>
-                <td>{{ produit_vendu.createdAt ? produit_vendu.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ produit_vendu.createdby }}</td>
+        <tbody>
+        {% for pv in produit_vendus %}
+            {% set lignCA      = pv.qty * pv.prixUnitaire %}
+            {% set prixAchat   = pv.produit.prixAchat ?? 0 %}
+            {% set lignCout    = pv.qty * prixAchat %}
+            {% set lignMarge   = lignCA - lignCout %}
+            {% set lignTaux    = pv.tauxMarge ?? 0 %}
+            {% set isCanceled  = pv.vente.statusVente == 'canceled' %}
+            <tr class="{{ isCanceled ? 'opacity-50 line-through' : '' }}">
+                <td>{{ pv.vente ? pv.vente.numeroVente : '-' }}</td>
+                <td>{{ pv.produit.designation }}</td>
+                <td>{{ pv.produit.categorie ? pv.produit.categorie.designation : '-' }}</td>
                 <td>
-{#                    <a href="{{ path('app_produit_vendu_show', {'id': produit_vendu.id}) }}">show</a>#}
-{#                    <a href="{{ path('app_produit_vendu_edit', {'id': produit_vendu.id}) }}">edit</a>#}
+                    {% if pv.vente.statusVente == 'paid' %}
+                        <span class="badge bg-success text-white px-2 py-1 rounded text-xs">Payé</span>
+                    {% elseif pv.vente.statusVente == 'progress' %}
+                        <span class="badge bg-primary text-white px-2 py-1 rounded text-xs">En cours</span>
+                    {% else %}
+                        <span class="badge bg-danger text-white px-2 py-1 rounded text-xs">Annulé</span>
+                    {% endif %}
                 </td>
+                <td>{{ pv.qty }}</td>
+                <td>{{ pv.prixUnitaire|number_format(0, ',', ' ') }}</td>
+                {% if is_granted('ROLE_PHARMACIEN') %}
+                <td>{{ prixAchat|number_format(0, ',', ' ') }}</td>
+                {% endif %}
+                <td class="font-semibold">{{ lignCA|number_format(0, ',', ' ') }}</td>
+                {% if is_granted('ROLE_PHARMACIEN') %}
+                <td>{{ lignCout|number_format(0, ',', ' ') }}</td>
+                <td class="{{ lignMarge >= 0 ? 'text-success' : 'text-danger' }} font-semibold">
+                    {{ lignMarge|number_format(0, ',', ' ') }}
+                </td>
+                <td class="{{ lignTaux >= 20 ? 'text-success' : (lignTaux >= 0 ? 'text-warning' : 'text-danger') }}">
+                    {{ lignTaux }} %
+                </td>
+                {% endif %}
+                <td>{{ pv.vente.venteDate ? pv.vente.venteDate|date('d/m/Y') : '' }}</td>
+                <td>{{ pv.createdby }}</td>
             </tr>
-
+        {% else %}
+            <tr>
+                <td colspan="{{ is_granted('ROLE_PHARMACIEN') ? 13 : 10 }}" class="text-center text-gray-400 py-4">Aucun produit vendu sur cette période.</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
-<strong>Grand-Total: {{ grandtotal }}</strong>
-    </div>
-{#    <a href="{{ path('app_produit_vendu_new') }}">Create new</a>#}
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatables.js') }}"></script>
-    <script src="{{ asset('assets/js/jszip.min.js') }}"></script>
-    <script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
-    <script>
-        let table = new DataTable('#datatable', {
-            dom: '<"flex justify-between"lf>rtip',
-            initComplete: function () {
-                this.api().buttons().container().appendTo('#export-buttons');
-            },
-            language: {
-                info: 'Page _PAGE_ / _PAGES_',
-                infoEmpty: 'No records available',
-                infoFiltered: '(filtered from _MAX_ total records)',
-                lengthMenu: 'Afficher _MENU_ ligne par page',
-                zeroRecords: 'Nothing found - sorry'
-            },
-            buttons: [
-                {
-                    extend: 'copy',
-                    text: 'Copier',
-                    className: 'btn btn-sm btn-secondary',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'excel',
-                    text: 'Excel',
-                    className: 'btn btn-sm btn-success',
-                    filename: 'Historique des ventes',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'csv',
-                    text: 'CSV',
-                    className: 'btn btn-sm btn-info',
-                    filename: 'Historique des ventes',
-                    exportOptions: { columns: ':not(:last-child)' }
-                },
-                {
-                    extend: 'pdf',
-                    text: 'PDF',
-                    className: 'btn btn-sm btn-danger',
-                    filename: 'Historique des ventes',
-                    title: 'Historique des ventes',
-                    exportOptions: { columns: ':not(:last-child)' }
-                }
-            ]
-        });
-    </script>
+</div>
 
-    {% endblock %}
+<script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/js/datatables.js') }}"></script>
+<script src="{{ asset('assets/js/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/js/buttons.html5.min.js') }}"></script>
+<script>
+    let table = new DataTable('#datatable', {
+        dom: '<"flex justify-between"lf>rtip',
+        order: [],
+        initComplete: function () {
+            this.api().buttons().container().appendTo('#export-buttons');
+        },
+        language: {
+            info: 'Page _PAGE_ / _PAGES_',
+            infoEmpty: 'Aucune ligne trouvée',
+            infoFiltered: '(filtré sur _MAX_ lignes)',
+            lengthMenu: 'Afficher _MENU_ lignes par page',
+            zeroRecords: 'Aucun résultat'
+        },
+        buttons: [
+            {
+                extend: 'excel',
+                text: 'Excel',
+                className: 'btn btn-sm btn-success',
+                filename: 'Produits vendus',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'csv',
+                text: 'CSV',
+                className: 'btn btn-sm btn-info',
+                filename: 'Produits vendus',
+                exportOptions: { columns: ':not(:last-child)' }
+            },
+            {
+                extend: 'pdf',
+                text: 'PDF',
+                className: 'btn btn-sm btn-danger',
+                filename: 'Produits vendus',
+                title: 'Historique des produits vendus',
+                exportOptions: { columns: ':not(:last-child)' }
+            }
+        ]
+    });
+</script>
+
+{% endblock %}

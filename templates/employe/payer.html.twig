@@ -2,37 +2,74 @@
 
 {% block content %}
 
-<div class="panel">
-    <div class="flex justify-between mb-3">
-        <h1>Payer — {{ employe.nomcomplet }}</h1>
-        <a href="{{ path('app_employe_index') }}" class="btn btn-secondary btn-sm">Retour</a>
+{# ── En-tête employé ── #}
+<div class="panel mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+            <div class="text-xs text-gray-400 uppercase font-semibold tracking-widest mb-1">Fiche paie</div>
+            <h1 class="text-2xl font-bold">{{ employe.nomcomplet }}</h1>
+        </div>
+        <a href="{{ path('app_employe_index') }}" class="btn btn-outline-secondary btn-sm">← Retour</a>
     </div>
-    <table class="table mb-0">
-        <tr>
-            <th>Matricule</th>
-            <td>{{ employe.matricule }}</td>
-            <th>Titre</th>
-            <td>{{ employe.titre }}</td>
-            <th>Catégorie</th>
-            <td>{{ employe.categorie }}</td>
-            <th>Salaire journalier</th>
-            <td><strong>{{ employe.salaireJournalier ?? 0 | number_format(2) }}</strong></td>
-        </tr>
-    </table>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-gray-50 dark:bg-dark rounded-lg p-3">
+            <div class="text-xs text-gray-400 uppercase font-semibold mb-1">Matricule</div>
+            <div class="font-semibold">{{ employe.matricule ?? '—' }}</div>
+        </div>
+        <div class="bg-gray-50 dark:bg-dark rounded-lg p-3">
+            <div class="text-xs text-gray-400 uppercase font-semibold mb-1">Titre</div>
+            <div class="font-semibold">{{ employe.titre ?? '—' }}</div>
+        </div>
+        <div class="bg-gray-50 dark:bg-dark rounded-lg p-3">
+            <div class="text-xs text-gray-400 uppercase font-semibold mb-1">Catégorie</div>
+            <div class="font-semibold">{{ employe.categorie ?? '—' }}</div>
+        </div>
+        <div class="bg-primary/10 rounded-lg p-3">
+            <div class="text-xs text-primary uppercase font-semibold mb-1">Salaire journalier</div>
+            <div class="font-bold text-primary text-lg">{{ (employe.salaireJournalier ?? 0)|number_format(2, ',', ' ') }} FC</div>
+        </div>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+{# ── Tabs ── #}
+<div class="panel" x-data="{ tab: 'paie' }">
 
-    {# Formulaire de paie #}
-    <div class="panel">
-        <h2 class="text-lg font-semibold mb-4">Nouvelle paie</h2>
-        <form method="post">
+    {# Barre d'onglets #}
+    <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+        <button
+            type="button"
+            class="px-5 py-3 text-sm font-medium border-b-2 transition-colors"
+            :class="tab === 'paie'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            @click="tab = 'paie'">
+            Nouvelle paie
+        </button>
+        <button
+            type="button"
+            class="px-5 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2"
+            :class="tab === 'historique'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            @click="tab = 'historique'">
+            Historique
+            {% if paiesEmploye|length > 0 %}
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-primary text-white">
+                {{ paiesEmploye|length }}
+            </span>
+            {% endif %}
+        </button>
+    </div>
+
+    {# ── Tab : Nouvelle paie ── #}
+    <div x-show="tab === 'paie'" x-cloak>
+        <form method="post" class="max-w-lg">
             <input type="hidden" name="_token" value="{{ csrf_token('payer' ~ employe.id) }}">
 
             <div class="mb-4">
-                <label class="block mb-1" for="periode">Période de paie</label>
+                <label class="block text-sm font-medium mb-1" for="periode">Période de paie</label>
                 <select class="form-input" name="periode" id="periode" required>
-                    <option value="">-- Choisir une période --</option>
+                    <option value="">— Choisir une période —</option>
                     {% for periode in periodes %}
                         <option value="{{ periode.id }}">{{ periode.label }}</option>
                     {% endfor %}
@@ -40,77 +77,97 @@
             </div>
 
             <div class="mb-4">
-                <label class="block mb-1" for="nb_jours">Nombre de jours travaillés</label>
+                <label class="block text-sm font-medium mb-1" for="nb_jours">Jours travaillés</label>
                 <input type="number" name="nb_jours" id="nb_jours" class="form-input"
                        min="1" max="31" value="{{ nbJoursDefaut }}" required
                        oninput="calculer()">
             </div>
 
-            <div class="mb-4">
-                <label class="block mb-1">Salaire de base (calculé)</label>
-                <input type="text" id="salaire_base" class="form-input bg-gray-100" readonly>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="primes">Primes (FC)</label>
+                    <input type="number" name="primes" id="primes" class="form-input"
+                           min="0" step="0.01" value="0" oninput="calculer()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" for="deductions">Déductions (FC)</label>
+                    <input type="number" name="deductions" id="deductions" class="form-input"
+                           min="0" step="0.01" value="0" oninput="calculer()">
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block mb-1" for="primes">Primes</label>
-                <input type="number" name="primes" id="primes" class="form-input"
-                       min="0" step="0.01" value="0" oninput="calculer()">
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-1" for="deductions">Déductions</label>
-                <input type="number" name="deductions" id="deductions" class="form-input"
-                       min="0" step="0.01" value="0" oninput="calculer()">
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-1">Total net</label>
-                <input type="text" id="total_net" class="form-input bg-gray-100 font-bold" readonly>
+            <div class="rounded-xl bg-gray-50 dark:bg-dark p-4 mb-4 space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Salaire de base</span>
+                    <span id="salaire_base_display" class="font-semibold">0,00 FC</span>
+                    <input type="hidden" id="salaire_base">
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">+ Primes</span>
+                    <span id="primes_display" class="font-semibold text-success">0,00 FC</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">− Déductions</span>
+                    <span id="deductions_display" class="font-semibold text-danger">0,00 FC</span>
+                </div>
+                <div class="border-t pt-2 flex justify-between">
+                    <span class="font-semibold">Total net</span>
+                    <span id="total_net_display" class="font-bold text-primary text-lg">0,00 FC</span>
+                    <input type="hidden" id="total_net">
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary w-full">Enregistrer la paie</button>
         </form>
     </div>
 
-    {# Historique des paies #}
-    <div class="panel">
-        <h2 class="text-lg font-semibold mb-4">Historique des paies</h2>
+    {# ── Tab : Historique ── #}
+    <div x-show="tab === 'historique'" x-cloak>
         {% if paiesEmploye is empty %}
-            <p class="text-gray-500">Aucune paie enregistrée.</p>
+            <div class="text-center text-gray-400 py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Aucune paie enregistrée
+            </div>
         {% else %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Période</th>
-                        <th>Jours</th>
-                        <th>Base</th>
-                        <th>Primes</th>
-                        <th>Déductions</th>
-                        <th>Total</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for paie in paiesEmploye %}
-                    <tr>
-                        <td>{{ paie.paie.label }}</td>
-                        <td>{{ paie.nbJours }}</td>
-                        <td>{{ paie.salaireBase | number_format(2) }}</td>
-                        <td>{{ paie.primes | number_format(2) }}</td>
-                        <td>{{ paie.deductions | number_format(2) }}</td>
-                        <td><strong>{{ paie.total | number_format(2) }}</strong></td>
-                        <td>{{ paie.createdAt ? paie.createdAt|date('d-m-Y') : '' }}</td>
-                        <td class="flex gap-1">
-                            <a href="{{ path('app_employe_fiche_paie', {'id': paie.id}) }}"
-                               class="btn btn-sm btn-secondary" target="_blank">Voir</a>
-                            <a href="{{ path('app_employe_fiche_paie_pdf', {'id': paie.id}) }}"
-                               class="btn btn-sm btn-success">PDF</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="overflow-auto">
+                <table class="table text-sm w-full">
+                    <thead>
+                        <tr>
+                            <th>Période</th>
+                            <th class="text-right">Jours</th>
+                            <th class="text-right">Base</th>
+                            <th class="text-right">Primes</th>
+                            <th class="text-right">Déd.</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-right">Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for paie in paiesEmploye %}
+                        <tr>
+                            <td class="font-medium">{{ paie.paie.label }}</td>
+                            <td class="text-right">{{ paie.nbJours }}</td>
+                            <td class="text-right text-gray-500">{{ paie.salaireBase|number_format(0, ',', ' ') }}</td>
+                            <td class="text-right text-success">{{ paie.primes|number_format(0, ',', ' ') }}</td>
+                            <td class="text-right text-danger">{{ paie.deductions|number_format(0, ',', ' ') }}</td>
+                            <td class="text-right font-bold text-primary">{{ paie.total|number_format(0, ',', ' ') }}</td>
+                            <td class="text-right text-gray-400 text-xs">{{ paie.createdAt ? paie.createdAt|date('d/m/Y') : '' }}</td>
+                            <td class="text-right">
+                                <div class="flex gap-1 justify-end">
+                                    <a href="{{ path('app_employe_fiche_paie', {'id': paie.id}) }}"
+                                       class="btn btn-xs btn-secondary" target="_blank">Voir</a>
+                                    <a href="{{ path('app_employe_fiche_paie_pdf', {'id': paie.id}) }}"
+                                       class="btn btn-xs btn-success">PDF</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
     </div>
 
@@ -119,14 +176,23 @@
 <script>
     const salaireJournalier = {{ employe.salaireJournalier ?? 0 }};
 
+    function fmt(n) {
+        return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' FC';
+    }
+
     function calculer() {
-        const nbJours = parseFloat(document.getElementById('nb_jours').value) || 0;
-        const primes = parseFloat(document.getElementById('primes').value) || 0;
-        const deductions = parseFloat(document.getElementById('deductions').value) || 0;
-        const base = salaireJournalier * nbJours;
+        const nbJours    = parseFloat(document.getElementById('nb_jours').value)    || 0;
+        const primes     = parseFloat(document.getElementById('primes').value)       || 0;
+        const deductions = parseFloat(document.getElementById('deductions').value)   || 0;
+        const base  = salaireJournalier * nbJours;
         const total = base + primes - deductions;
-        document.getElementById('salaire_base').value = base.toFixed(2);
-        document.getElementById('total_net').value = total.toFixed(2);
+
+        document.getElementById('salaire_base').value               = base.toFixed(2);
+        document.getElementById('total_net').value                  = total.toFixed(2);
+        document.getElementById('salaire_base_display').textContent = fmt(base);
+        document.getElementById('primes_display').textContent       = fmt(primes);
+        document.getElementById('deductions_display').textContent   = fmt(deductions);
+        document.getElementById('total_net_display').textContent    = fmt(total);
     }
 
     calculer();

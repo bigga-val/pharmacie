@@ -2,6 +2,7 @@
 
 namespace App\Service;
 use App\Entity\BonProduit;
+use App\Entity\PaieEmploye;
 use App\Repository\DebitRepository;
 use App\Repository\LigneBonProduitRepository;
 use App\Repository\ProduitVenduRepository;
@@ -250,23 +251,26 @@ class FPdfGenerator
         $pdf->SetFillColor(221); // Couleur des filets RVB
         $pdf->SetTextColor(0); // Couleur du texte noir
 
+        // Logo
+        $logoPath = $this->logoPath();
+        if ($logoPath) {
+            $pdf->Image($logoPath, 15, 2, 20);
+        }
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetY(3);
+        $pdf->SetX(37);
+        $pdf->Cell(40, 5, 'AFYA');
+
         $pdf->SetFont('Arial', '', 8);
-        $pdf->SetY(5);
-        $pdf->SetX(15);
-        $pdf->Cell(40, 10, 'Insoft Afya');
+        $pdf->SetY(9);
+        $pdf->SetX(37);
+        $pdf->Cell(40, 4, 'Facture No : '.$vente->getNumeroVente());
 
-        //$pdf->Image('assets/images/qazi.png', 147, 0, 50);
-
-        // Facture number label
-        $pdf->SetY(10);
-        $pdf->SetX(15);
-        $pdf->Cell(40,8,'Facture No : '.$vente->getNumeroVente());
-        //tracer une ligne horizontale
-        //$pdf->Line(15, 20, 195, 20);
         $pdf->Line(15, 17, 80, 17);
 
         //tableau des lignes de la facture
-        $tabY = 20;
+        $tabY = 22;
         $prodX = 15; $qtyX = $prodX + 15; $totX=$qtyX+15;
 
         //1° ligne du tableau
@@ -373,19 +377,22 @@ class FPdfGenerator
         $pdf->SetFillColor(221); // Couleur des filets RVB
         $pdf->SetTextColor(0); // Couleur du texte noir
 
+        // Logo
+        $logoPath = $this->logoPath();
+        if ($logoPath) {
+            $pdf->Image($logoPath, 15, 2, 20);
+        }
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetY(3);
+        $pdf->SetX(37);
+        $pdf->Cell(40, 5, 'AFYA');
+
         $pdf->SetFont('Arial', '', 8);
-        $pdf->SetY(5);
-        $pdf->SetX(15);
-        $pdf->Cell(40, 10, 'Insoft Afya');
+        $pdf->SetY(9);
+        $pdf->SetX(37);
+        $pdf->Cell(40, 4, 'Recu de versement');
 
-        //$pdf->Image('assets/images/qazi.png', 147, 0, 50);
-
-        // Facture number label
-        $pdf->SetY(10);
-        $pdf->SetX(15);
-        $pdf->Cell(40,8,'Restau - Lounge Bar');
-        //tracer une ligne horizontale
-        //$pdf->Line(15, 20, 195, 20);
         $pdf->Line(15, 17, 80, 17);
 
         //tableau des lignes de la facture
@@ -664,11 +671,20 @@ class FPdfGenerator
         $pdf->AddPage();
         $pdf->SetMargins(15, 10, 15);
 
-        // En-tête
+        // Logo + en-tête
+        $logoPath = $this->logoPath();
+        if ($logoPath) {
+            $pdf->Image($logoPath, 15, 8, 28);
+        }
         $pdf->SetFont('Arial', 'B', 14);
-        $pdf->SetFillColor(67, 97, 238); // primary blue
+        $pdf->SetFillColor(67, 97, 238);
         $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell(0, 12, 'BON DE COMMANDE - APPROVISIONNEMENT', 0, 1, 'C', true);
+        // Bande bleue sur toute la largeur, logo placé par-dessus
+        $pdf->SetY(8);
+        $pdf->SetX($logoPath ? 45 : 15);
+        $pageW = $pdf->GetPageWidth() - ($logoPath ? 60 : 30);
+        $pdf->Cell($pageW, 14, 'BON DE COMMANDE - APPROVISIONNEMENT', 0, 1, 'C', true);
+        $pdf->Ln(2);
 
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('Arial', '', 9);
@@ -704,6 +720,112 @@ class FPdfGenerator
         $pdf->Cell(0, 6, 'Signature : ___________________________', 0, 1, 'R');
 
         return $pdf->Output('S');
+    }
+
+    public function generateFichePaiePdf(PaieEmploye $paieEmploye): string
+    {
+        $employe = $paieEmploye->getEmploye();
+        $paie    = $paieEmploye->getPaie();
+
+        $pdf = new \FPDF();
+        $pdf->AddPage();
+        $pdf->SetMargins(15, 10, 15);
+
+        $enc = fn(string $s) => iconv('UTF-8', 'windows-1252//TRANSLIT', $s);
+
+        // ── En-tête ─────────────────────────────────────────────────────────
+        $logoPath = $this->logoPath();
+        if ($logoPath) {
+            $pdf->Image($logoPath, 15, 8, 28);
+        }
+        $pdf->SetFillColor(67, 97, 238);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFont('Arial', 'B', 14);
+        $pdf->SetY(8);
+        $pdf->SetX($logoPath ? 45 : 15);
+        $pageW = $pdf->GetPageWidth() - ($logoPath ? 60 : 30);
+        $pdf->Cell($pageW, 14, $enc('FICHE DE PAIE'), 0, 1, 'C', true);
+        $pdf->Ln(0);
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Ln(2);
+        $pdf->Cell(0, 5, $enc('Période : ' . ($paie?->getLabel() ?? '—')), 0, 1, 'R');
+        $pdf->Cell(0, 5, $enc('Émis le : ' . ($paieEmploye->getCreatedAt()?->format('d/m/Y') ?? date('d/m/Y'))), 0, 1, 'R');
+        $pdf->Ln(4);
+
+        // ── Infos employé ────────────────────────────────────────────────────
+        $pdf->SetFillColor(230, 234, 255);
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->Cell(0, 8, $enc('Informations de l\'employé'), 0, 1, 'L', true);
+        $pdf->Ln(2);
+
+        $pdf->SetFont('Arial', '', 9);
+        $colL = 45;
+        $colV = 135;
+
+        $infos = [
+            'Nom complet'        => $employe?->getNomcomplet() ?? '—',
+            'Matricule'          => $employe?->getMatricule()  ?? '—',
+            'Titre'              => $employe?->getTitre()      ?? '—',
+            'Catégorie'          => $employe?->getCategorie()  ?? '—',
+            'Salaire journalier' => number_format($employe?->getSalaireJournalier() ?? 0, 2, ',', ' ') . ' FC',
+        ];
+
+        foreach ($infos as $label => $value) {
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell($colL, 6, $enc($label . ' :'), 0, 0, 'L');
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->Cell($colV, 6, $enc($value), 0, 1, 'L');
+        }
+
+        $pdf->Ln(5);
+
+        // ── Détail de la paie ────────────────────────────────────────────────
+        $pdf->SetFillColor(230, 234, 255);
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->Cell(0, 8, $enc('Détail de la paie'), 0, 1, 'L', true);
+        $pdf->Ln(2);
+
+        $lignes = [
+            ['Jours travaillés',  $paieEmploye->getNbJours() . ' jour(s)',                                           false],
+            ['Salaire de base',   number_format($paieEmploye->getSalaireBase()  ?? 0, 2, ',', ' ') . ' FC',         false],
+            ['Primes',            number_format($paieEmploye->getPrimes()       ?? 0, 2, ',', ' ') . ' FC',         false],
+            ['Déductions',        number_format($paieEmploye->getDeductions()   ?? 0, 2, ',', ' ') . ' FC',         false],
+        ];
+
+        $pdf->SetFont('Arial', '', 9);
+        $fill = false;
+        foreach ($lignes as [$label, $value, $_]) {
+            $pdf->SetFillColor(245, 246, 255);
+            $pdf->Cell($colL, 7, $enc($label . ' :'), 'B', 0, 'L', $fill);
+            $pdf->Cell($colV, 7, $enc($value),         'B', 1, 'R', $fill);
+            $fill = !$fill;
+        }
+
+        // Total net
+        $pdf->Ln(2);
+        $pdf->SetFillColor(67, 97, 238);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFont('Arial', 'B', 11);
+        $total = number_format($paieEmploye->getTotal() ?? 0, 2, ',', ' ') . ' FC';
+        $pdf->Cell($colL, 10, $enc('NET À PAYER :'), 0, 0, 'L', true);
+        $pdf->Cell($colV, 10, $enc($total),           0, 1, 'R', true);
+
+        // ── Signatures ───────────────────────────────────────────────────────
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Ln(15);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(90, 6, $enc('Signature employé : ___________________'), 0, 0, 'L');
+        $pdf->Cell(90, 6, $enc('Signature responsable : ___________________'), 0, 1, 'R');
+
+        return $pdf->Output('S');
+    }
+
+    private function logoPath(): ?string
+    {
+        $path = dirname(__DIR__, 2) . '/public/assets/images/afya.png';
+        return file_exists($path) ? $path : null;
     }
 
     public function generateBonPdf(BonProduit $bonProduit,

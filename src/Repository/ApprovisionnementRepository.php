@@ -213,7 +213,7 @@ class ApprovisionnementRepository extends ServiceEntityRepository
             '    
             SELECT p.id produitID, p.code, concat(p.designation, \' - \', UPPER(p.code)) as designation ,
              p.prix, p.uniteMesure, p.minimum, p.maximum, p.preemption, p.fabricant,
-                    (p.prix+(p.prix *  coalesce(cp.Pourcentage, 40)/100)) prixTotal
+                    p.prix prixTotal
             FROM App\Entity\Produits p,
             App\Entity\CategorieProduit cp
             where p.Categorie = cp.id
@@ -245,11 +245,10 @@ class ApprovisionnementRepository extends ServiceEntityRepository
     public function approparDate($mydate): array{
         $em = $this->getEntityManager();
         $query = $em->createQuery(
-            'SELECT SUM(a.qty * p.prix) montant, SUM(a.qty * p.prix) / a.taux convert         
-                    FROM App\Entity\Produits p, App\Entity\Approvisionnement a
-                     where a.produit = p.id
-                        and a.approDate = :mydate
-                    GROUP BY a.approDate 
+            'SELECT SUM(a.cout) montant, SUM(a.cout / a.taux) convert
+                    FROM App\Entity\Approvisionnement a
+                     where a.approDate = :mydate
+                    GROUP BY a.approDate
             '
         );
         //$query->setParameter('mydate', $mydate);

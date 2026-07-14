@@ -5,13 +5,16 @@ namespace App\Controller;
 use App\Entity\CategorieProduit;
 use App\Form\CategorieProduitType;
 use App\Repository\CategorieProduitRepository;
+use App\Repository\ProduitsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/categorie/produit')]
+#[IsGranted('ROLE_PHARMACIEN')]
 class CategorieProduitController extends AbstractController
 {
     #[Route('/', name: 'app_categorie_produit_index', methods: ['GET', 'POST'])]
@@ -65,12 +68,16 @@ class CategorieProduitController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_categorie_produit_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CategorieProduit $categorieProduit, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, CategorieProduit $categorieProduit, EntityManagerInterface $entityManager, ProduitsRepository $produitsRepository): Response
     {
         $form = $this->createForm(CategorieProduitType::class, $categorieProduit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $pourcentage = $categorieProduit->getPourcentage() ?? 0;
+            foreach ($produitsRepository->findBy(['Categorie' => $categorieProduit]) as $produit) {
+                $produit->setPrix(($produit->getPrixAchat() ?? 0) * (1 + $pourcentage / 100));
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('app_categorie_produit_index', [], Response::HTTP_SEE_OTHER);

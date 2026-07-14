@@ -136,13 +136,14 @@
                     </button>
                     <ul x-cloak x-show="openDropdowns['produit']" x-collapse data-menu="produit" class="mt-1 ml-4 pl-3 border-l-2 border-gray-100 dark:border-[#1b2e4b] space-y-0.5">
                         <li><a href="{{ path('app_produits_index') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Liste</a></li>
+                        {% if is_granted('ROLE_PHARMACIEN') %}
                         <li><a href="{{ path('app_produits_new') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Nouveau produit</a></li>
+                        <li><a href="{{ path('app_produits_import') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Importer</a></li>
+                        {% endif %}
                     </ul>
                 </li>
 
-                {% if is_granted('ROLE_ADMIN') %}
-
-                {# Approvisionnement #}
+                {# Approvisionnement — Stock visible par tous, reste réservé pharmacien/admin #}
                 <li>
                     <button type="button"
                         class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 text-gray-600 dark:text-gray-400 hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
@@ -161,11 +162,16 @@
                         </svg>
                     </button>
                     <ul x-cloak x-show="openDropdowns['approvisionnement']" x-collapse data-menu="approvisionnement" class="mt-1 ml-4 pl-3 border-l-2 border-gray-100 dark:border-[#1b2e4b] space-y-0.5">
-                        <li><a href="{{ path('app_approvisionnement_new') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Approvisionner</a></li>
-                        <li><a href="{{ path('app_approvisionnement_index') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Historique</a></li>
                         <li><a href="{{ path('app_approvisionnement_stock') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Stock</a></li>
+                        {% if is_granted('ROLE_PHARMACIEN') %}
+                        <li><a href="{{ path('app_approvisionnement_new') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Approvisionner</a></li>
+                        <li><a href="{{ path('app_approvisionnement_import') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Importer</a></li>
+                        <li><a href="{{ path('app_approvisionnement_index') }}" class="block px-3 py-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors">Historique</a></li>
+                        {% endif %}
                     </ul>
                 </li>
+
+                {% if is_granted('ROLE_ADMIN') %}
 
                 {# Catégories #}
                 <li>
@@ -307,7 +313,8 @@
                     </a>
                 </li>
 
-                {# Journal d'audit #}
+                {# Journal d'audit — pharmacien et admin #}
+                {% if is_granted('ROLE_PHARMACIEN') %}
                 <li>
                     <a href="{{ path('app_audit_log_index') }}"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-all duration-150">
@@ -319,6 +326,7 @@
                         Journal d'audit
                     </a>
                 </li>
+                {% endif %}
 
                 {% endif %}
 

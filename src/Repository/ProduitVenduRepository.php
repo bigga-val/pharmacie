@@ -57,13 +57,16 @@ class ProduitVenduRepository extends ServiceEntityRepository
 
     /**
      * Calcule la marge bénéficiaire sur les ventes payées de la période.
-     * CA   = SUM(qty × prixUnitaire)  [FC]
-     * Coût = SUM(qty × coûtMoyenAchat) [FC], avec coûtMoyenAchat = SUM(cout)/SUM(qty) par produit
+     *
+     * Utilise uniquement les données snapshotées sur chaque ligne de vente :
+     *   CA        = SUM(qty × prixUnitaire)
+     *   prixAchat = prixUnitaire / (1 + tauxMarge / 100)   ← déduit des snapshots
+     *   Coût      = SUM(qty × prixAchat)
+     *   Marge     = CA − Coût
      */
     public function calculerMarge(?\DateTimeImmutable $debut, ?\DateTimeImmutable $fin): array
     {
-        $conn = $this->getEntityManager()->getConnection();
-
+        $conn   = $this->getEntityManager()->getConnection();
         $where  = "v.status_vente = 'paid'";
         $params = [];
 
@@ -78,24 +81,21 @@ class ProduitVenduRepository extends ServiceEntityRepository
 
         $sql = "
             SELECT
-                COALESCE(SUM(pv.qty * pv.prix_unitaire), 0)                          AS chiffreAffaires,
-                COALESCE(SUM(pv.qty * COALESCE(a_avg.cout_moyen, 0)), 0)              AS coutAchats
+                COALESCE(SUM(pv.qty * pv.prix_unitaire), 0) AS chiffreAffaires,
+                COALESCE(SUM(
+                    pv.qty * (
+                        pv.prix_unitaire / (1 + COALESCE(pv.taux_marge, 0) / 100)
+                    )
+                ), 0) AS coutAchats
             FROM produit_vendu pv
-            JOIN vente v        ON v.id = pv.vente_id
-            LEFT JOIN (
-                SELECT produit_id,
-                       CASE WHEN SUM(qty) > 0 THEN SUM(cout) / SUM(qty) ELSE 0 END AS cout_moyen
-                FROM   approvisionnement
-                WHERE  type = 'approvisionnement' AND qty > 0
-                GROUP  BY produit_id
-            ) a_avg ON a_avg.produit_id = pv.produit_id
+            JOIN vente v ON v.id = pv.vente_id
             WHERE $where
         ";
 
-        $row = $conn->prepare($sql)->executeQuery($params)->fetchAssociative();
+        $row  = $conn->prepare($sql)->executeQuery($params)->fetchAssociative();
 
-        $ca   = (float)($row['chiffreAffaires'] ?? 0);
-        $cout = (float)($row['coutAchats']      ?? 0);
+        $ca    = (float)($row['chiffreAffaires'] ?? 0);
+        $cout  = (float)($row['coutAchats']      ?? 0);
         $marge = $ca - $cout;
 
         return [
@@ -106,18 +106,21 @@ class ProduitVenduRepository extends ServiceEntityRepository
         ];
     }
 
-    public function findByDateIntervalle($start, $end): array
+    public function findByDateIntervalle($start, $end, ?string $status = null): array
     {
+        $qb = $this->createQueryBuilder('pv')
+            ->join('pv.vente', 'v')
+            ->where('v.venteDate BETWEEN :start AND :end')
+            ->setParameter('start', $start->format('Y-m-d'))
+            ->setParameter('end', $end->format('Y-m-d'))
+            ->orderBy('pv.id', 'DESC');
 
+        if ($status) {
+            $qb->andWhere('v.statusVente = :status')
+               ->setParameter('status', $status);
+        }
 
-        return $this->createQueryBuilder('p')
-            ->where('p.createdAt BETWEEN :start AND :end')
-            ->setParameter('start', $start)
-            ->setParameter('end', $end)
-            ->orderBy('p.id', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
+        return $qb->getQuery()->getResult();
     }
 
 //    public function findOneBySomeField($value): ?ProduitVendu

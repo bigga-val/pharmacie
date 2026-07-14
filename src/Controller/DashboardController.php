@@ -13,11 +13,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 class DashboardController extends AbstractController
 {
     #[Route('/board', name: 'app_dashboard')]
-    #[\Symfony\Component\Security\Http\Attribute\IsGranted('ROLE_ADMIN')]
     public function index(
         Request               $request,
         VenteRepository       $venteRepo,
@@ -28,17 +29,23 @@ class DashboardController extends AbstractController
         EmployeRepository     $employeRepo,
         AuditLogRepository    $auditRepo,
     ): Response {
-        // KPIs
-        $caHier           = $venteRepo->caHier();
-        $nbVentesHier     = $venteRepo->countHier();
-        $caMois           = $venteRepo->caMoisCourant();
-        $nbVentes         = $venteRepo->countMoisCourant();
-        $masseSalariale   = $paieEmployeRepo->masseSalarialeMoisCourant();
-        $totalCredits     = $creditRepo->totalMoisCourant();
-        $totalDebits      = $debitRepo->totalMoisCourant();
-        $nbEmployes       = $employeRepo->countAll();
+        $isAdmin      = $this->isGranted('ROLE_ADMIN');
+        $isPharmacien = $this->isGranted('ROLE_PHARMACIEN');
 
-        // Graphique CA 6 derniers mois (remplissage des mois sans ventes)
+        // KPIs communs
+        $caHier       = $venteRepo->caHier();
+        $nbVentesHier = $venteRepo->countHier();
+        $caMois       = $venteRepo->caMoisCourant();
+        $nbVentes     = $venteRepo->countMoisCourant();
+
+        // KPIs admin uniquement
+        $masseSalariale = $isAdmin ? $paieEmployeRepo->masseSalarialeMoisCourant() : 0;
+        $totalCredits   = $isAdmin ? $creditRepo->totalMoisCourant() : 0;
+        $totalDebits    = $isAdmin ? $debitRepo->totalMoisCourant() : 0;
+        $nbEmployes     = $isAdmin ? $employeRepo->countAll() : 0;
+        $derniersLogs   = $isPharmacien ? array_slice($auditRepo->findFiltered(null, null, null, null, null), 0, 8) : [];
+
+        // Graphique CA 6 derniers mois
         $caParMoisRaw    = $venteRepo->caParMois(6);
         $caParMoisIndexe = [];
         foreach ($caParMoisRaw as $row) {
@@ -52,7 +59,7 @@ class DashboardController extends AbstractController
             $caData[]   = $caParMoisIndexe[$mois] ?? 0;
         }
 
-        // Graphique ventes par jour du mois courant (remplissage des jours sans ventes)
+        // Graphique ventes par jour du mois courant
         $joursRaw    = $venteRepo->ventesParJourDuMois();
         $joursIndexe = [];
         foreach ($joursRaw as $row) {
@@ -62,17 +69,14 @@ class DashboardController extends AbstractController
         $joursLabels = range(1, $nbJoursMois);
         $joursData   = array_map(fn($j) => $joursIndexe[$j] ?? 0, $joursLabels);
 
-        // Top 5 produits (avec filtre de dates optionnel)
+        // Top 5 produits
         $date1 = $request->query->get('date1');
         $date2 = $request->query->get('date2');
         $topDebut = $date1 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date1) : null;
         $topFin   = $date2 ? \DateTimeImmutable::createFromFormat('Y-m-d', $date2) : null;
         $topProduits = $produitVenduRepo->topProduits(5, $topDebut, $topFin);
 
-        // Tableaux récents
-        $dernieresVentes    = $venteRepo->dernieres(5);
-        $derniersLogs       = $auditRepo->findFiltered(null, null, null, null, null);
-        $derniersLogs       = array_slice($derniersLogs, 0, 8);
+        $dernieresVentes = $venteRepo->dernieres(5);
 
         return $this->render('index.html.twig', [
             'caHier'           => $caHier,

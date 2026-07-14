@@ -35,8 +35,8 @@
         <button @click="activeTab = 'commandes'"
             class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-4 text-center group hover:border-primary hover:shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)] transition-all"
             :class="activeTab === 'commandes' ? 'border-primary shadow-[0px_0px_2px_0px_rgba(67,97,238,0.30)]' : ''">
-            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor"/><ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3" fill="currentColor"/><circle cx="9.00098" cy="6" r="4" fill="currentColor"/><ellipse cx="9.00098" cy="17.001" rx="7" ry="4" fill="currentColor"/></svg>
-            <p class="text-xs font-semibold">Commandes</p>
+            <svg class="w-8 h-8 mx-auto text-primary mb-2" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" fill="currentColor"/><path d="M8 8h8M8 12h8M8 16h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p class="text-xs font-semibold">Bon de commande</p>
         </button>
 
         <button @click="activeTab = 'stock'"
@@ -70,7 +70,7 @@
             <li><button @click="activeTab = 'dashboard'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'dashboard' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Dashboard</button></li>
             <li><button @click="activeTab = 'ventes'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'ventes' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Ventes</button></li>
             <li><button @click="activeTab = 'produits'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'produits' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Produits</button></li>
-            <li><button @click="activeTab = 'commandes'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'commandes' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Commandes</button></li>
+            <li><button @click="activeTab = 'commandes'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'commandes' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Bon de commande</button></li>
             <li><button @click="activeTab = 'stock'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'stock' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Stock</button></li>
             <li><button @click="activeTab = 'caisse'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'caisse' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">Caisse</button></li>
             <li><button @click="activeTab = 'rh'" class="px-4 py-2.5 transition-all border-b-2 -mb-px" :class="activeTab === 'rh' ? 'border-primary text-primary' : 'border-transparent hover:text-primary'">RH & Paie</button></li>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
                     <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span class="text-sm font-semibold text-primary">Commandes avec workflow d'approbation</span>
+                    <span class="text-sm font-semibold text-primary">Bon de commande fournisseur (export PDF)</span>
                 </div>
                 <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
                     <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -113,7 +113,7 @@
                 </div>
                 <div class="flex items-start gap-3 p-4 rounded-md bg-primary/10">
                     <svg class="w-5 h-5 text-primary mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span class="text-sm font-semibold text-primary">Taux de change & gestion des tables</span>
+                    <span class="text-sm font-semibold text-primary">Taux de change & alertes configurables</span>
                 </div>
             </div>
             <div class="mt-5 flex items-center gap-2 p-3 rounded-md bg-info/10 border border-info/20">
@@ -185,7 +185,7 @@
                 <h3 class="text-base font-bold">Tableau de bord</h3>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Tous les rôles</span>
             </div>
-            <p class="text-white-dark text-sm mb-5">Page d'accueil de l'application. Affiche une synthèse en temps réel de l'activité de l'entreprise.</p>
+            <p class="text-white-dark text-sm mb-5">Page d'accueil accessible à tous les utilisateurs connectés. Le contenu affiché varie selon le rôle : l'infirmière voit les KPI de ventes et les graphiques ; le pharmacien voit en plus le journal d'audit ; l'admin voit tout (caisse, masse salariale, employés, audit).</p>
 
             <h4 class="font-bold text-sm mb-3">Indicateurs clés (KPI)</h4>
             <div class="table-responsive mb-5">
@@ -195,7 +195,6 @@
                         <tr><td class="font-semibold">CA Hier</td><td class="text-white-dark">Chiffre d'affaires réalisé la veille, avec variation en %</td></tr>
                         <tr><td class="font-semibold">CA du mois</td><td class="text-white-dark">Chiffre d'affaires cumulé du mois en cours</td></tr>
                         <tr><td class="font-semibold">Transactions du mois</td><td class="text-white-dark">Nombre de ventes effectuées ce mois</td></tr>
-                        <tr><td class="font-semibold">Commandes en attente</td><td class="text-white-dark">Commandes fournisseurs en attente d'approbation</td></tr>
                         <tr><td class="font-semibold">Masse salariale</td><td class="text-white-dark">Total des salaires versés ce mois</td></tr>
                         <tr><td class="font-semibold">Flux de trésorerie</td><td class="text-white-dark">Solde global crédits / débits</td></tr>
                         <tr><td class="font-semibold">Employés</td><td class="text-white-dark">Nombre total d'employés actifs</td></tr>
@@ -336,9 +335,9 @@
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
                 <div class="flex items-center gap-2 mb-1">
                     <h3 class="text-base font-bold">Gestion des Produits</h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin & Vendeur</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-info/10 text-info border border-info/20">Lecture : tous · Écriture : Pharmacien & Admin</span>
                 </div>
-                <p class="text-white-dark text-sm">Gérez le catalogue de produits, les catégories et les niveaux de stock.</p>
+                <p class="text-white-dark text-sm">Gérez le catalogue de produits, les catégories et les niveaux de stock. L'infirmière peut consulter les fiches et le stock. La création, modification, suppression et import Excel sont réservés au Pharmacien et à l'Admin.</p>
             </div>
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
@@ -396,87 +395,55 @@
     </div>
 
     {# ═══════════════════════════════════════ #}
-    {# ONGLET : COMMANDES #}
+    {# ONGLET : BON DE COMMANDE #}
     {# ═══════════════════════════════════════ #}
     <div x-show="activeTab === 'commandes'" x-cloak>
         <div class="space-y-3" x-data="{ active: null }">
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
-                <div class="flex items-center gap-2 mb-3">
-                    <h3 class="text-base font-bold">Commandes Fournisseurs</h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">Tous les rôles</span>
+                <div class="flex items-center gap-2 mb-2">
+                    <h3 class="text-base font-bold">Bon de commande fournisseur</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning border border-warning/20">Pharmacien & Admin</span>
                 </div>
-                <p class="text-white-dark text-sm mb-4">Cycle de vie d'une commande :</p>
-                <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
-                    <span class="px-3 py-1.5 rounded-full bg-[#f1f2f3] dark:bg-[#1b2e4b] text-black dark:text-white">Brouillon</span>
-                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    <span class="px-3 py-1.5 rounded-full bg-warning/10 text-warning">Soumise</span>
-                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    <span class="px-3 py-1.5 rounded-full bg-success/10 text-success">Approuvée</span>
-                    <span class="text-gray-400">/</span>
-                    <span class="px-3 py-1.5 rounded-full bg-danger/10 text-danger">Rejetée</span>
-                    <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none"><path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                    <span class="px-3 py-1.5 rounded-full bg-info/10 text-info">Réceptionnée</span>
-                </div>
+                <p class="text-white-dark text-sm">Génère un bon de commande PDF listant les produits dont le stock est en dessous du seuil minimum, à envoyer au fournisseur.</p>
             </div>
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 1 }" x-on:click="active === 1 ? active = null : active = 1">
-                    <span>Créer une commande</span>
+                    <span>Générer un bon de commande</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 1 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div x-cloak x-show="active === 1" x-collapse>
                     <div class="px-5 pb-5 text-white-dark text-sm">
-                        <ol class="list-decimal list-inside space-y-1.5">
-                            <li>Allez dans <strong class="text-black dark:text-white">Commande Produit → Commander</strong>.</li>
-                            <li>Ajoutez les lignes : produit, quantité, prix unitaire.</li>
-                            <li>Cliquez sur <span class="inline-block bg-[#f1f2f3] dark:bg-[#1b2e4b] text-xs font-bold px-2 py-0.5 rounded">Enregistrer en brouillon</span> ou <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Soumettre</span> directement.</li>
+                        <ol class="list-decimal list-inside space-y-1.5 mb-3">
+                            <li>Allez dans <strong class="text-black dark:text-white">Approvisionnement → Stock</strong>.</li>
+                            <li>Les produits en stock bas sont automatiquement mis en évidence.</li>
+                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Bon de commande PDF</span> pour télécharger le document avec le logo Afya.</li>
                         </ol>
-                        <p class="mt-2 text-xs text-info">Numéro de commande généré automatiquement (ex : COM00001).</p>
+                        <div class="p-3 rounded bg-info/10 border border-info/20 text-info text-xs">
+                            Le PDF liste les produits concernés, les quantités à commander (stock minimum − stock actuel), et inclut une ligne de signature pour le responsable.
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
-                    <span>Approuver ou rejeter une commande <span class="text-xs font-normal text-white-dark">(Approbateurs)</span></span>
+                    <span>Contenu du bon de commande</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div x-cloak x-show="active === 2" x-collapse>
                     <div class="px-5 pb-5 text-white-dark text-sm">
-                        <ol class="list-decimal list-inside space-y-1.5">
-                            <li>Allez dans <strong class="text-black dark:text-white">Commande Produit → Historique</strong>.</li>
-                            <li>Trouvez la commande avec le statut <span class="inline-block bg-warning/10 text-warning text-xs font-bold px-2 py-0.5 rounded">Soumise</span>.</li>
-                            <li>Cliquez sur <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Approuver</span> ou <span class="inline-block bg-danger/10 text-danger text-xs font-bold px-2 py-0.5 rounded">Rejeter</span>.</li>
-                        </ol>
-                        <p class="mt-2 text-xs text-warning">Vous devez être dans la liste des approbateurs. Contactez un admin si besoin.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
-                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
-                    <span>Réceptionner une commande</span>
-                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div x-cloak x-show="active === 3" x-collapse>
-                    <div class="px-5 pb-5 text-white-dark text-sm">
-                        <ol class="list-decimal list-inside space-y-1.5">
-                            <li>Ouvrez la commande <span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Approuvée</span>.</li>
-                            <li>Dans la section <strong class="text-black dark:text-white">Réception</strong>, confirmez les quantités reçues.</li>
-                            <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Confirmer la réception</span>.</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
-                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 4 }" x-on:click="active === 4 ? active = null : active = 4">
-                    <span>Gérer les approbateurs <span class="text-xs font-normal text-white-dark">(Admin)</span></span>
-                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 4 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </div>
-                <div x-cloak x-show="active === 4" x-collapse>
-                    <div class="px-5 pb-5 text-white-dark text-sm">
-                        Allez dans <strong class="text-black dark:text-white">Commande Produit → Approbateur</strong> pour ajouter ou retirer des utilisateurs de la liste des approbateurs.
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead><tr><th>Colonne</th><th>Description</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="font-semibold">N°</td><td>Numéro de ligne</td></tr>
+                                    <tr><td class="font-semibold">Désignation</td><td>Nom du produit</td></tr>
+                                    <tr><td class="font-semibold">Qté à commander</td><td>Calculé automatiquement</td></tr>
+                                    <tr><td class="font-semibold">Reçu</td><td>Case vide à remplir à la réception</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -492,7 +459,7 @@
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-5">
                 <div class="flex items-center gap-2">
                     <h3 class="text-base font-bold">Approvisionnement & Stock</h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-info/10 text-info border border-info/20">Stock : tous · Appro. : Pharmacien & Admin</span>
                 </div>
             </div>
 
@@ -551,6 +518,24 @@
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
+                    <span>Importer des approvisionnements via Excel <span class="text-xs font-normal text-white-dark">(Pharmacien & Admin)</span></span>
+                    <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div x-cloak x-show="active === 3" x-collapse>
+                    <div class="px-5 pb-5 text-white-dark text-sm space-y-2">
+                        <ol class="list-decimal list-inside space-y-1.5">
+                            <li>Allez dans <strong class="text-black dark:text-white">Approvisionnement → Importer</strong>.</li>
+                            <li>Téléchargez d'abord le modèle Excel (<span class="inline-block bg-success/10 text-success text-xs font-bold px-2 py-0.5 rounded">Télécharger le modèle</span>) qui contient les colonnes requises.</li>
+                            <li>Remplissez : code produit, quantité, prix unitaire (optionnel), date (optionnel).</li>
+                            <li>Glissez-déposez le fichier ou cliquez pour le sélectionner, puis <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Importer</span>.</li>
+                        </ol>
+                        <p class="text-xs text-info">Si le prix unitaire est omis, le prix d'achat du produit est utilisé par défaut. Si la date est omise, la date du jour est utilisée.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
+                <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 4 }" x-on:click="active === 4 ? active = null : active = 4">
                     <span>Voir les niveaux de stock actuels</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
@@ -692,7 +677,7 @@
                 <div x-cloak x-show="active === 3" x-collapse>
                     <div class="px-5 pb-5 text-white-dark text-sm">
                         <ol class="list-decimal list-inside space-y-1.5">
-                            <li>Allez dans <strong class="text-black dark:text-white">Employe → Listes des Frais</strong>.</li>
+                            <li>Allez dans <strong class="text-black dark:text-white">Paie → Périodes de paie</strong>.</li>
                             <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Nouvelle Période</span>.</li>
                             <li>Saisissez le nom (ex : "Mars 2026") et les dates.</li>
                             <li>Cliquez sur <span class="inline-block bg-primary/10 text-primary text-xs font-bold px-2 py-0.5 rounded">Enregistrer</span>.</li>
@@ -714,7 +699,7 @@
                     <h3 class="text-base font-bold">Administration</h3>
                     <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">Admin uniquement</span>
                 </div>
-                <p class="text-white-dark text-sm mt-1">Gestion des utilisateurs, taux de change et tables.</p>
+                <p class="text-white-dark text-sm mt-1">Gestion des utilisateurs, taux de change et alertes.</p>
             </div>
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
@@ -752,12 +737,22 @@
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'text-primary bg-primary/5': active === 3 }" x-on:click="active === 3 ? active = null : active = 3">
-                    <span>Gérer les tables (restaurant / bar)</span>
+                    <span>Configurer les alertes</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 3 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div x-cloak x-show="active === 3" x-collapse>
                     <div class="px-5 pb-5 text-white-dark text-sm">
-                        Allez dans <strong class="text-black dark:text-white">Tables → Tables</strong> pour voir, ajouter, modifier ou supprimer des tables. Chaque table peut être associée à une vente.
+                        <p class="mb-3">Allez dans <strong class="text-black dark:text-white">Alertes → Configuration</strong> (route <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded">/alertes/config</code>) pour activer ou désactiver les alertes et régler le délai avant péremption.</p>
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead><tr><th>Paramètre</th><th>Description</th><th>Défaut</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="font-semibold">Alertes stock bas</td><td class="text-white-dark">Signale les produits dont le stock est ≤ seuil minimum</td><td>Activé</td></tr>
+                                    <tr><td class="font-semibold">Alertes péremption</td><td class="text-white-dark">Signale les produits dont la date de péremption approche</td><td>Activé</td></tr>
+                                    <tr><td class="font-semibold">Délai avant péremption</td><td class="text-white-dark">Nombre de jours avant la date d'expiration pour déclencher l'alerte</td><td>30 jours</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -770,35 +765,71 @@
     {# ═══════════════════════════════════════ #}
     <div x-show="activeTab === 'roles'" x-cloak>
         <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726] p-6 mb-4">
-            <h3 class="text-base font-bold mb-4">Rôles & Permissions</h3>
+            <h3 class="text-base font-bold mb-2">Rôles & Permissions</h3>
+            <p class="text-white-dark text-sm mb-5">L'application utilise une hiérarchie de 4 rôles. Chaque rôle hérite des permissions du rôle inférieur :
+                <span class="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">ROLE_ADMIN → ROLE_PHARMACIEN → ROLE_INFIRMIERE → ROLE_USER</span>
+            </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+                {# ROLE_USER #}
                 <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md p-4">
-                    <h4 class="font-bold text-sm mb-2">Utilisateur standard</h4>
-                    <ul class="space-y-1 text-sm text-white-dark">
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ventes & factures</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Commandes fournisseurs</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Catalogue produits</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Caisse / Employés / Admin</li>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-gray-400 shrink-0"></span>
+                        <h4 class="font-bold text-sm">Utilisateur <span class="text-gray-400 font-normal text-xs">(ROLE_USER)</span></h4>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Tableau de bord (KPI ventes)</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Ventes</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Produits, stock, caisse…</li>
                     </ul>
                 </div>
+
+                {# ROLE_INFIRMIERE #}
                 <div class="border border-info/40 rounded-md p-4 bg-info/5">
-                    <h4 class="font-bold text-sm mb-2 text-info">Vendeur (ROLE_USER)</h4>
-                    <ul class="space-y-1 text-sm text-white-dark">
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ventes & factures</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Catalogue produits (lecture)</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Caisse / Finances / Admin</li>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-info shrink-0"></span>
+                        <h4 class="font-bold text-sm text-info">Infirmière <span class="text-info/60 font-normal text-xs">(ROLE_INFIRMIERE)</span></h4>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Tableau de bord (KPI ventes)</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ventes & factures (avec confirmation)</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Voir produits & stock</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Modifier produits / approvisionner</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Prix d'achat / caisse / RH</li>
                     </ul>
                 </div>
+
+                {# ROLE_PHARMACIEN #}
+                <div class="border border-warning/40 rounded-md p-4 bg-warning/5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-warning shrink-0"></span>
+                        <h4 class="font-bold text-sm text-warning">Pharmacien <span class="text-warning/60 font-normal text-xs">(ROLE_PHARMACIEN)</span></h4>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Tout ce que l'infirmière peut faire</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Créer / modifier / supprimer produits</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Approvisionner (import Excel)</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Voir prix d'achat & journal d'audit</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-danger shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Caisse / RH / Utilisateurs</li>
+                    </ul>
+                </div>
+
+                {# ROLE_ADMIN #}
                 <div class="border border-primary/40 rounded-md p-4 bg-primary/5">
-                    <h4 class="font-bold text-sm mb-2 text-primary">Administrateur</h4>
-                    <ul class="space-y-1 text-sm text-white-dark">
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Accès complet à tout</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Gestion utilisateurs & employés</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Caisse & finances avancées</li>
-                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Configuration complète</li>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-primary shrink-0"></span>
+                        <h4 class="font-bold text-sm text-primary">Administrateur <span class="text-primary/60 font-normal text-xs">(ROLE_ADMIN)</span></h4>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-white-dark">
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Accès complet à toutes les fonctions</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Caisse, crédits & débits</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Employés, périodes de paie & fiches</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Gestion des utilisateurs & alertes</li>
+                        <li class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-success shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Ajustements de stock</li>
                     </ul>
                 </div>
+
             </div>
 
             <h4 class="font-bold text-sm mb-3">Tableau détaillé des accès</h4>
@@ -807,22 +838,35 @@
                     <thead>
                         <tr>
                             <th>Fonctionnalité</th>
-                            <th class="text-center">Vendeur</th>
-                            <th class="text-center">Admin</th>
+                            <th class="text-center text-xs">Infirmière</th>
+                            <th class="text-center text-xs">Pharmacien</th>
+                            <th class="text-center text-xs">Admin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Ventes & factures</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Produits & catégories</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Approvisionnement & stock</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Tableau de bord</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Caisse & trésorerie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Employés & paie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Taux de change</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Gestion utilisateurs</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
-                        <tr><td>Crédits & Débits</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Tableau de bord (KPI ventes)</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Tableau de bord (caisse, RH, audit)</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Ventes & factures</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Voir produits & stock</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Créer / modifier / supprimer produits</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Importer produits & appro. (Excel)</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Voir prix d'achat & bénéfices</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Approvisionnement (historique & new)</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Ajustement de stock</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Journal d'audit</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Caisse & trésorerie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Crédits & Débits</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Employés & paie</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Taux de change</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Gestion utilisateurs</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
+                        <tr><td>Config. alertes</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-danger font-bold">✗</td><td class="text-center text-success font-bold">✓</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="mt-4 p-3 rounded-md bg-warning/10 border border-warning/20 text-sm text-warning flex items-start gap-2">
+                <svg class="w-4 h-4 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none"><path opacity="0.5" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" fill="currentColor"/><path d="M12 7.75V13M12 16.25V16" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span>Lorsqu'un utilisateur sans le rôle Infirmière tente d'enregistrer une vente, une confirmation lui est demandée avant de valider l'opération.</span>
             </div>
         </div>
     </div>
@@ -841,19 +885,19 @@
                 </div>
                 <div x-cloak x-show="active === 1" x-collapse>
                     <div class="p-5 text-white-dark font-semibold text-sm">
-                        Le menu Produits est accessible à tous les utilisateurs connectés (Vendeur et Admin).
+                        Le menu Produits est accessible à tous les utilisateurs connectés (Infirmière, Pharmacien et Admin). L'infirmière peut consulter les produits et le stock ; seuls le pharmacien et l'admin peuvent créer, modifier ou supprimer des produits.
                     </div>
                 </div>
             </div>
 
             <div class="border border-[#ebedf2] dark:border-[#191e3a] rounded-md bg-white dark:bg-[#0e1726]">
                 <div class="flex font-semibold p-5 cursor-pointer" :class="{ 'bg-primary/20 text-primary': active === 2 }" x-on:click="active === 2 ? active = null : active = 2">
-                    <span class="text-primary">Je ne peux pas approuver une commande.</span>
+                    <span class="text-primary">Je reçois une alerte stock bas mais le stock semble correct.</span>
                     <svg class="w-5 h-5 ltr:ml-auto rtl:mr-auto transition-transform" :class="{ 'rotate-180': active === 2 }" viewBox="0 0 24 24" fill="none"><path d="M19 9L12 15L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div x-cloak x-show="active === 2" x-collapse>
                     <div class="p-5 text-white-dark font-semibold text-sm">
-                        Pour approuver des commandes, vous devez être ajouté à la liste des approbateurs par un administrateur via <strong class="text-black dark:text-white">Commande Produit → Approbateur</strong>.
+                        L'alerte se déclenche lorsque le stock disponible est ≤ au seuil minimum défini sur la fiche produit. Vérifiez le champ <strong class="text-black dark:text-white">Stock minimum</strong> dans <strong class="text-black dark:text-white">Produits → (fiche produit)</strong> et ajustez-le si nécessaire. Un admin peut aussi faire un ajustement de stock via <strong class="text-black dark:text-white">Approvisionnement → Ajustement</strong>.
                     </div>
                 </div>
             </div>
